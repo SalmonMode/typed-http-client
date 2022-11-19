@@ -2,12 +2,12 @@
   "name": "typed-http-client",
   "version": "0.1.0",
   "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses.",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "npx tsc",
-    "test": "nyc mocha --recursive ./build/",
-    "test:ci": "nyc mocha --recursive ./build/ --reporter mocha-junit-reporter"
+    "test": "nyc mocha --recursive ./dist/",
+    "test:ci": "nyc mocha --recursive ./dist/ --reporter mocha-junit-reporter"
   },
   "nyc": {
     "extension": [
