@@ -1,12 +1,14 @@
 import { HttpMethod } from "./HttpMethod";
 
 export interface RequestInitSansMethod extends Omit<RequestInit, "method"> {}
+export interface RequestInitSansBody extends Omit<RequestInit, "body"> {}
+export interface RequestInitSansMethodAndBody extends Omit<RequestInit, "body" | "method"> {}
 /**
  * The details for a HEAD request.
  * 
  * HEAD requests cannot have a body.
  */
-export interface HeadRequestInit extends Omit<RequestInit, "body"> {
+export interface HeadRequestInit extends RequestInitSansBody {
   method: HttpMethod.HEAD;
 }
 export interface OptionsRequestInit extends RequestInit {
@@ -17,7 +19,7 @@ export interface OptionsRequestInit extends RequestInit {
  * 
  * GET requests cannot have a body.
  */
-export interface GetRequestInit extends Omit<RequestInit, "body"> {
+export interface GetRequestInit extends RequestInitSansBody {
   method: HttpMethod.GET;
 }
 export interface DeleteRequestInit extends RequestInit {
@@ -42,9 +44,9 @@ export type IRequestInit =
   | PutRequestInit;
 
 export interface IHttpClient {
-  head(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  head(requestUrl: URL, requestInit: RequestInitSansMethodAndBody): Promise<Response>;
   options(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  get(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  get(requestUrl: URL, requestInit: RequestInitSansMethodAndBody): Promise<Response>;
   delete(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
   post(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
   patch(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;

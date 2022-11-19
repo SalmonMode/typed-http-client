@@ -11,6 +11,7 @@ import {
   PutRequestInit,
   RequestInitSansMethod,
   HttpMethod,
+  RequestInitSansMethodAndBody,
 } from "../types";
 
 export default class HttpClient implements IHttpClient {
@@ -33,7 +34,7 @@ export default class HttpClient implements IHttpClient {
    */
   public async head(
     requestUrl: URL,
-    requestInit: RequestInitSansMethod = {}
+    requestInit: RequestInitSansMethodAndBody = {}
   ): Promise<Response> {
     const requestInitWithMethod: HeadRequestInit = {
       ...requestInit,
@@ -69,7 +70,7 @@ export default class HttpClient implements IHttpClient {
    */
   public async get(
     requestUrl: URL,
-    requestInit: RequestInitSansMethod = { }
+    requestInit: RequestInitSansMethodAndBody = { }
   ): Promise<Response> {
     const requestInitWithMethod: GetRequestInit = {
       ...requestInit,
@@ -177,7 +178,8 @@ export default class HttpClient implements IHttpClient {
   /**
    * Create the {@link Headers} object to be used for the request.
    *
-   * A {@link Headers} object is preferred by cross-fetch for the headers.
+   * A {@link Headers} object is preferred by cross-fetch for the headers. It also allows for case-insensitive
+   * lookups of header keys, which is convenient.
    *
    * @param headers The {@link HeadersInit} settings that will be used to produce the headers for the request
    * @returns The formed {@link Headers} object

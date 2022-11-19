@@ -15,7 +15,9 @@ Being able to specify the shape of what the request functions (`get`, `post`, et
 
 ## Strongly typed responses
 
-Using the hooks provided for [type assertion functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), the client makes it easy to both provide typing information for any code downstream from the response, as well as catch any problems with the server response as soon as it comes back.
+Using the hook provided for processing a response, the caller can define the means to both parse the response from the backend and provide the typing information for it.
+
+Using tools like [type assertion functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), the caller can easily maintain type safety while providing a means of flow control if necessary for any problematic responses.
 
 Type assertion function are similar to [type predicates](https://www.typescriptlang.org/docs/handbook/advanced-types.html#using-type-predicates), but rely on errors being thrown to tell the rest of the code whether or not the argument passed matches the anticipated type. If no error is thrown—and it can be any error type—then the argument passed must be what was anticipated. Because any error type can be thrown, you can use different error types to provide for different error handling logic, and build that error however you desire.
 
