@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/SalmonMode/typed-http-client/branch/main/graph/badge.svg?token=E28MMT0TC6)](https://codecov.io/gh/SalmonMode/typed-http-client)
+
 # typed-http-client
 A TypeScript HTTP client that facilitates strongly typed requests and responses.
 
