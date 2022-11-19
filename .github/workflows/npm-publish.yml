@@ -25,13 +25,13 @@ jobs:
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           # A comma separated list of code coverage files to analyse. Also supports using glob patterns to match multiple files.
-          filename: "**/cobertura-coverage.xml"
+          filename: coverage/cobertura-coverage.xml
           # Include a Line Rate coverage badge in the output using shields.io - true / false (default).
           badge: true
           # Fail if overall Line Rate below lower threshold - true / false (default).
           fail_below_min: 100
           # Output Format - markdown or text (default).
-          format: text
+          format: markdown
           # Hide Branch Rate values in the output - true / false (default).
           hide_branch_rate: false
           # Hide Complexity values in the output - true / false (default).
