@@ -42,5 +42,7 @@ jobs:
           output: both
           # Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.
           thresholds: "100 100"
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
