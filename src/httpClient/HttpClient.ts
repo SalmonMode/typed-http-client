@@ -10,8 +10,8 @@ import {
   PostRequestInit,
   PutRequestInit,
   RequestInitSansMethod,
-} from "./interfaces";
-import { HttpMethods } from "./HttpMethods";
+  HttpMethod,
+} from "../types";
 
 export default class HttpClient implements IHttpClient {
   /**
@@ -37,7 +37,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: HeadRequestInit = {
       ...requestInit,
-      method: HttpMethods.HEAD
+      method: HttpMethod.HEAD
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }
@@ -55,7 +55,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: OptionsRequestInit = {
       ...requestInit,
-      method: HttpMethods.OPTIONS
+      method: HttpMethod.OPTIONS
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }
@@ -73,7 +73,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: GetRequestInit = {
       ...requestInit,
-      method: HttpMethods.GET
+      method: HttpMethod.GET
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }
@@ -91,7 +91,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: DeleteRequestInit = {
       ...requestInit,
-      method: HttpMethods.DELETE
+      method: HttpMethod.DELETE
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }
@@ -109,7 +109,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: PostRequestInit = {
       ...requestInit,
-      method: HttpMethods.POST
+      method: HttpMethod.POST
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }
@@ -127,7 +127,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: PatchRequestInit = {
       ...requestInit,
-      method: HttpMethods.PATCH
+      method: HttpMethod.PATCH
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }
@@ -145,7 +145,7 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: PutRequestInit = {
       ...requestInit,
-      method: HttpMethods.PUT
+      method: HttpMethod.PUT
     }
     return await this.request(requestUrl, requestInitWithMethod);
   }

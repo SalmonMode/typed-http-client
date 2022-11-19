@@ -1,26 +1,26 @@
-import { HttpMethods } from "./HttpMethods";
+import { HttpMethod } from "./HttpMethod";
 
 export interface RequestInitSansMethod extends Exclude<RequestInit, "method"> {}
 export interface HeadRequestInit extends RequestInit {
-  method: HttpMethods.HEAD;
+  method: HttpMethod.HEAD;
 }
 export interface OptionsRequestInit extends RequestInit {
-  method: HttpMethods.OPTIONS;
+  method: HttpMethod.OPTIONS;
 }
 export interface GetRequestInit extends RequestInit {
-  method: HttpMethods.GET;
+  method: HttpMethod.GET;
 }
 export interface DeleteRequestInit extends RequestInit {
-  method: HttpMethods.DELETE;
+  method: HttpMethod.DELETE;
 }
 export interface PostRequestInit extends RequestInit {
-  method: HttpMethods.POST;
+  method: HttpMethod.POST;
 }
 export interface PatchRequestInit extends RequestInit {
-  method: HttpMethods.PATCH;
+  method: HttpMethod.PATCH;
 }
 export interface PutRequestInit extends RequestInit {
-  method: HttpMethods.PUT;
+  method: HttpMethod.PUT;
 }
 export type IRequestInit =
   | HeadRequestInit
