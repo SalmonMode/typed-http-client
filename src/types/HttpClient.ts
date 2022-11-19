@@ -1,13 +1,23 @@
 import { HttpMethod } from "./HttpMethod";
 
-export interface RequestInitSansMethod extends Exclude<RequestInit, "method"> {}
-export interface HeadRequestInit extends RequestInit {
+export interface RequestInitSansMethod extends Omit<RequestInit, "method"> {}
+/**
+ * The details for a HEAD request.
+ * 
+ * HEAD requests cannot have a body.
+ */
+export interface HeadRequestInit extends Omit<RequestInit, "body"> {
   method: HttpMethod.HEAD;
 }
 export interface OptionsRequestInit extends RequestInit {
   method: HttpMethod.OPTIONS;
 }
-export interface GetRequestInit extends RequestInit {
+/**
+ * The details for a GET request.
+ * 
+ * GET requests cannot have a body.
+ */
+export interface GetRequestInit extends Omit<RequestInit, "body"> {
   method: HttpMethod.GET;
 }
 export interface DeleteRequestInit extends RequestInit {
@@ -33,11 +43,11 @@ export type IRequestInit =
 
 export interface IHttpClient {
   head(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  options(requestUrl: URL, requestInit: OptionsRequestInit): Promise<Response>;
-  get(requestUrl: URL, requestInit: GetRequestInit): Promise<Response>;
-  delete(requestUrl: URL, requestInit: DeleteRequestInit): Promise<Response>;
-  post(requestUrl: URL, requestInit: PostRequestInit): Promise<Response>;
-  patch(requestUrl: URL, requestInit: PatchRequestInit): Promise<Response>;
-  put(requestUrl: URL, requestInit: PutRequestInit): Promise<Response>;
+  options(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  get(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  delete(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  post(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  patch(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
+  put(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
   request(requestUrl: URL, requestInit: IRequestInit): Promise<Response>;
 }
