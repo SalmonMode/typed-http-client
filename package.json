@@ -1,0 +1,54 @@
+{
+  "name": "typed-http-client",
+  "version": "0.1.0",
+  "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses.",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "npx tsc",
+    "test": "nyc mocha --recursive ./build/",
+    "test:ci": "nyc mocha --recursive ./build/ --reporter mocha-junit-reporter"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "**/*.spec.ts",
+      "coverage"
+    ],
+    "reporter": [
+      "html",
+      "cobertura"
+    ],
+    "all": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SalmonMode/typed-http-client"
+  },
+  "author": "Chris NeJame",
+  "license": "MIT",
+  "dependencies": {
+    "cross-fetch": "^3.1.5"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.11.9",
+    "@types/sinon": "^10.0.13",
+    "chai": "^4.3.7",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^10.1.0",
+    "mocha-junit-reporter": "^2.2.0",
+    "nock": "^13.2.9",
+    "nyc": "^15.1.0",
+    "sinon": "^14.0.2",
+    "source-map-support": "^0.5.21",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.3"
+  }
+}
