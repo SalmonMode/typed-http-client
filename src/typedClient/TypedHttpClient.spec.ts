@@ -4,6 +4,7 @@ import * as nock from "nock";
 import { Body } from "nock/types";
 import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
 import { ResponseBodyNotJSONError } from "../errors";
+import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers";
 import { isNullish, isString } from "../typePredicates";
 import { TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
@@ -233,6 +234,49 @@ describe("TypedHttpClient", function () {
         expect(params.get("other")).to.equal("world");
       });
     });
+    describe("With Reviver", function () {
+      const expectedDate = new Date();
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .get("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData & {
+            myDate: string;
+          } {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok", myDate: expectedDate.toISOString() };
+          });
+        restRes = await client.get(
+          {
+            url: standardUrl,
+            responseJsonReviver: JsonISO8601DateAndTimeReviver,
+          },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({
+          status: "ok",
+          myDate: expectedDate,
+        });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("used empty string for request body", function () {
+        expect(requestBody).to.equal("");
+      });
+      it("uses GET", async function () {
+        expect(requestMethod).to.equal("GET");
+      });
+    });
     describe("Without body", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
@@ -377,7 +421,7 @@ describe("TypedHttpClient", function () {
     let requestHeaders: Headers;
     let restRes: TypedResponse<ResponseData>;
 
-    describe("With body", function () {
+    describe("With body (generics provided)", function () {
       let payload = {
         something: "hello",
         other: "world",
@@ -393,6 +437,46 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.post<ResponseData, Record<string, any>>(
+          { url: standardUrl, payload },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses application/json header by default", function () {
+        expect(requestHeaders.get("content-type")).to.equal(
+          "application/json; charset=utf8"
+        );
+      });
+      it("encoded request body in JSON format by default", async function () {
+        expect(requestBody).to.deep.equal(payload);
+      });
+      it("uses POST", function () {
+        expect(requestMethod).to.equal("POST");
+      });
+    });
+    describe("With body (generics inferred)", function () {
+      let payload = {
+        something: "hello",
+        other: "world",
+      };
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .post("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.post(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -461,7 +545,7 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("POST");
       });
     });
-    describe("Without body", function () {
+    describe("Without body (generic provided)", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -499,6 +583,41 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("POST");
       });
     });
+    describe("Without body (generic inferred)", function () {
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .post("/")
+          .reply(
+            200,
+            function (uri: string, reqBody: Body): ResponseData {
+              requestHeaders = new Headers(this.req.headers);
+              requestMethod = this.req.method;
+              requestBody = reqBody;
+              return { status: "ok" };
+            },
+            { "content-type": "application/json" }
+          );
+        restRes = await client.post({ url: standardUrl }, parseRawResponseData);
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("used empty string for request body", function () {
+        expect(requestBody).to.equal("");
+      });
+      it("uses POST", function () {
+        expect(requestMethod).to.equal("POST");
+      });
+    });
     describe("Without body and with options", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
@@ -510,7 +629,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.post<ResponseData>(
+        restRes = await client.post(
           { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
           parseRawResponseData
         );
@@ -544,7 +663,7 @@ describe("TypedHttpClient", function () {
     let requestHeaders: Headers;
     let restRes: TypedResponse<ResponseData>;
 
-    describe("With body", function () {
+    describe("With body (generics provided)", function () {
       let payload = {
         something: "hello",
         other: "world",
@@ -560,6 +679,46 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.put<ResponseData, Record<string, any>>(
+          { url: standardUrl, payload },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses application/json header by default", function () {
+        expect(requestHeaders.get("content-type")).to.equal(
+          "application/json; charset=utf8"
+        );
+      });
+      it("encoded request body in JSON format by default", async function () {
+        expect(requestBody).to.deep.equal(payload);
+      });
+      it("uses PUT", async function () {
+        expect(requestMethod).to.equal("PUT");
+      });
+    });
+    describe("With body (generics inferred)", function () {
+      let payload = {
+        something: "hello",
+        other: "world",
+      };
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .put("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.put(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -628,7 +787,7 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("PUT");
       });
     });
-    describe("Without body", function () {
+    describe("Without body (generic provided)", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -643,6 +802,37 @@ describe("TypedHttpClient", function () {
           { url: standardUrl },
           parseRawResponseData
         );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("used empty string for request body", function () {
+        expect(requestBody).to.equal("");
+      });
+      it("uses PUT", async function () {
+        expect(requestMethod).to.equal("PUT");
+      });
+    });
+    describe("Without body (generic inferred)", function () {
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .put("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.put({ url: standardUrl }, parseRawResponseData);
       });
 
       after(function () {
@@ -707,7 +897,7 @@ describe("TypedHttpClient", function () {
     let requestHeaders: Headers;
     let restRes: TypedResponse<ResponseData>;
 
-    describe("With body", function () {
+    describe("With body (generics provided)", function () {
       let payload = {
         something: "hello",
         other: "world",
@@ -723,6 +913,46 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.patch<ResponseData, Record<string, any>>(
+          { url: standardUrl, payload },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses application/json header by default", function () {
+        expect(requestHeaders.get("content-type")).to.equal(
+          "application/json; charset=utf8"
+        );
+      });
+      it("encoded request body in JSON format by default", async function () {
+        expect(requestBody).to.deep.equal(payload);
+      });
+      it("uses PATCH", async function () {
+        expect(requestMethod).to.equal("PATCH");
+      });
+    });
+    describe("With body (generics inferred)", function () {
+      let payload = {
+        something: "hello",
+        other: "world",
+      };
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .patch("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.patch(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -791,7 +1021,7 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("PATCH");
       });
     });
-    describe("Without body", function () {
+    describe("Without body (generic provided)", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -803,6 +1033,40 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.patch<ResponseData>(
+          { url: standardUrl },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("used empty string for request body", function () {
+        expect(requestBody).to.equal("");
+      });
+      it("uses PATCH", async function () {
+        expect(requestMethod).to.equal("PATCH");
+      });
+    });
+    describe("Without body (generic inferred)", function () {
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .patch("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.patch(
           { url: standardUrl },
           parseRawResponseData
         );
@@ -870,7 +1134,7 @@ describe("TypedHttpClient", function () {
     let requestHeaders: Headers;
     let restRes: TypedResponse<ResponseData>;
 
-    describe("With body", function () {
+    describe("With body (generics provided)", function () {
       let payload = {
         something: "hello",
         other: "world",
@@ -886,6 +1150,46 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.options<ResponseData, Record<string, any>>(
+          { url: standardUrl, payload },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses application/json header by default", function () {
+        expect(requestHeaders.get("content-type")).to.equal(
+          "application/json; charset=utf8"
+        );
+      });
+      it("encoded request body in JSON format by default", async function () {
+        expect(requestBody).to.deep.equal(payload);
+      });
+      it("uses OPTIONS", async function () {
+        expect(requestMethod).to.equal("OPTIONS");
+      });
+    });
+    describe("With body (generics inferred)", function () {
+      let payload = {
+        something: "hello",
+        other: "world",
+      };
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .options("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.options(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -954,7 +1258,7 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("OPTIONS");
       });
     });
-    describe("Without body", function () {
+    describe("Without body (generic provided)", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -966,6 +1270,40 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.options<ResponseData>(
+          { url: standardUrl },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("used empty string for request body", function () {
+        expect(requestBody).to.equal("");
+      });
+      it("uses OPTIONS", async function () {
+        expect(requestMethod).to.equal("OPTIONS");
+      });
+    });
+    describe("Without body (generic inferred)", function () {
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .options("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.options(
           { url: standardUrl },
           parseRawResponseData
         );
@@ -1033,7 +1371,7 @@ describe("TypedHttpClient", function () {
     let requestHeaders: Headers;
     let restRes: TypedResponse<ResponseData>;
 
-    describe("With body", function () {
+    describe("With body (generics provided)", function () {
       let payload = {
         something: "hello",
         other: "world",
@@ -1049,6 +1387,46 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.delete<ResponseData, Record<string, any>>(
+          { url: standardUrl, payload },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses application/json header by default", function () {
+        expect(requestHeaders.get("content-type")).to.equal(
+          "application/json; charset=utf8"
+        );
+      });
+      it("encoded request body in JSON format by default", async function () {
+        expect(requestBody).to.deep.equal(payload);
+      });
+      it("uses DELETE", async function () {
+        expect(requestMethod).to.equal("DELETE");
+      });
+    });
+    describe("With body (generics inferred)", function () {
+      let payload = {
+        something: "hello",
+        other: "world",
+      };
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .delete("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.delete(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -1117,7 +1495,7 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("DELETE");
       });
     });
-    describe("Without body", function () {
+    describe("Without body (generic provided)", function () {
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -1129,6 +1507,40 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.delete<ResponseData>(
+          { url: standardUrl },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("used empty string for request body", function () {
+        expect(requestBody).to.equal("");
+      });
+      it("uses DELETE", async function () {
+        expect(requestMethod).to.equal("DELETE");
+      });
+    });
+    describe("Without body (generic inferred)", function () {
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .delete("/")
+          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+            requestHeaders = new Headers(this.req.headers);
+            requestMethod = this.req.method;
+            requestBody = reqBody;
+            return { status: "ok" };
+          });
+        restRes = await client.delete(
           { url: standardUrl },
           parseRawResponseData
         );

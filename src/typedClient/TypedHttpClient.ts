@@ -7,14 +7,12 @@ import {
   isTypedRequestOptionsWithPayloadWithAdditionalAndAccept,
 } from "../typePredicates";
 import {
-  RequestInitSansMethod,
-  RequestInitSansMethodAndBody,
+  JsonReviver,
+  RequestOptions,
+  RequestOptionsWithAdditionalAndAccept,
   ResponseProcessor,
   TypedRequestOptions,
-  TypedRequestOptionsSansPayload,
-  TypedRequestOptionsSansPayloadWithAdditionalAndAccept,
   TypedRequestOptionsWithAdditionalAndAccept,
-  TypedRequestOptionsWithPayloadWithAdditionalAndAccept,
   TypedResponse,
 } from "../types";
 
@@ -66,9 +64,9 @@ export default class TypedHttpClient {
    * @returns an object containing information about the response
    */
   public async head(
-    requestOptions: TypedRequestOptionsSansPayload
+    requestOptions: RequestOptions
   ): Promise<TypedResponse<undefined>> {
-    let requestInit = this._getRequestResources<undefined>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response: Response = await this.client.head(
       requestOptions.url,
       requestInit
@@ -86,13 +84,25 @@ export default class TypedHttpClient {
    * @param requestOptions the details for the request to be made
    * @returns an object containing information about the response
    */
-  public async options<ReturnType, PayloadType = undefined>(
+  public async options<ReturnType>(
+    requestOptions: RequestOptions,
+    responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async options<ReturnType, PayloadType>(
     requestOptions: TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async options<ReturnType, PayloadType>(
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources<PayloadType>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response = await this.client.options(requestOptions.url, requestInit);
-    return this.processResponse<ReturnType>(response, responseProcessor);
+    return this.processResponse(
+      response,
+      responseProcessor,
+      requestOptions.responseJsonReviver
+    );
   }
 
   /**
@@ -104,12 +114,16 @@ export default class TypedHttpClient {
    * @returns an object containing information about the response
    */
   public async get<ReturnType>(
-    requestOptions: TypedRequestOptionsSansPayload,
+    requestOptions: RequestOptions,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources<undefined>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response = await this.client.get(requestOptions.url, requestInit);
-    return this.processResponse<ReturnType>(response, responseProcessor);
+    return this.processResponse(
+      response,
+      responseProcessor,
+      requestOptions.responseJsonReviver
+    );
   }
 
   /**
@@ -118,13 +132,25 @@ export default class TypedHttpClient {
    * @param requestOptions the details for the request to be made
    * @returns an object containing information about the response
    */
-  public async post<ReturnType, PayloadType = undefined>(
+  public async post<ReturnType>(
+    requestOptions: RequestOptions,
+    responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async post<ReturnType, PayloadType>(
     requestOptions: TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async post<ReturnType, PayloadType>(
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources<PayloadType>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response = await this.client.post(requestOptions.url, requestInit);
-    return this.processResponse<ReturnType>(response, responseProcessor);
+    return this.processResponse(
+      response,
+      responseProcessor,
+      requestOptions.responseJsonReviver
+    );
   }
 
   /**
@@ -133,13 +159,25 @@ export default class TypedHttpClient {
    * @param requestOptions the details for the request to be made
    * @returns an object containing information about the response
    */
-  public async put<ReturnType, PayloadType = undefined>(
+  public async put<ReturnType>(
+    requestOptions: RequestOptions,
+    responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async put<ReturnType, PayloadType>(
     requestOptions: TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async put<ReturnType, PayloadType>(
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources<PayloadType>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response = await this.client.put(requestOptions.url, requestInit);
-    return this.processResponse<ReturnType>(response, responseProcessor);
+    return this.processResponse<ReturnType>(
+      response,
+      responseProcessor,
+      requestOptions.responseJsonReviver
+    );
   }
 
   /**
@@ -148,13 +186,25 @@ export default class TypedHttpClient {
    * @param requestOptions the details for the request to be made
    * @returns an object containing information about the response
    */
-  public async patch<ReturnType, PayloadType = undefined>(
+  public async patch<ReturnType>(
+    requestOptions: RequestOptions,
+    responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async patch<ReturnType, PayloadType>(
     requestOptions: TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async patch<ReturnType, PayloadType>(
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources<PayloadType>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response = await this.client.patch(requestOptions.url, requestInit);
-    return this.processResponse<ReturnType>(response, responseProcessor);
+    return this.processResponse(
+      response,
+      responseProcessor,
+      requestOptions.responseJsonReviver
+    );
   }
 
   /**
@@ -163,13 +213,25 @@ export default class TypedHttpClient {
    * @param requestOptions the details for the request to be made
    * @returns an object containing information about the response
    */
-  public async delete<ReturnType, PayloadType = undefined>(
+  public async delete<ReturnType>(
+    requestOptions: RequestOptions,
+    responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async delete<ReturnType, PayloadType>(
     requestOptions: TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
+  ): Promise<TypedResponse<ReturnType>>;
+  public async delete<ReturnType, PayloadType>(
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources<PayloadType>(requestOptions);
+    let requestInit = this._getRequestResources(requestOptions);
     let response = await this.client.delete(requestOptions.url, requestInit);
-    return this.processResponse<ReturnType>(response, responseProcessor);
+    return this.processResponse(
+      response,
+      responseProcessor,
+      requestOptions.responseJsonReviver
+    );
   }
 
   /**
@@ -186,25 +248,26 @@ export default class TypedHttpClient {
    * @returns the options with a content type handler explicitly defined
    */
   private _getRequestOptionsWithAdditionalAndAccept<PayloadType>(
-    requestOptions: TypedRequestOptions<PayloadType>
-  ): TypedRequestOptionsWithAdditionalAndAccept<PayloadType> {
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>
+  ):
+    | TypedRequestOptionsWithAdditionalAndAccept<PayloadType>
+    | RequestOptionsWithAdditionalAndAccept {
     const common = {
       acceptHeader: requestOptions.acceptHeader || "application/json",
       additionalHeaders: requestOptions.additionalHeaders || {},
     };
-    if (isTypedRequestOptionsWithPayload<PayloadType>(requestOptions)) {
+    if (isTypedRequestOptionsWithPayload(requestOptions)) {
       // A payload is provided, so be sure there is a content type handler.
-      const options: TypedRequestOptionsWithPayloadWithAdditionalAndAccept<PayloadType> =
-        {
-          ...common,
-          ...requestOptions,
-          contentTypeHandler:
-            requestOptions.contentTypeHandler || JSONContentTypeHandler,
-        };
+      const options: TypedRequestOptionsWithAdditionalAndAccept<PayloadType> = {
+        ...common,
+        ...requestOptions,
+        contentTypeHandler:
+          requestOptions.contentTypeHandler || JSONContentTypeHandler,
+      };
       return options;
     }
     // No payload provided so no need for a content type handler.
-    const options: TypedRequestOptionsSansPayloadWithAdditionalAndAccept = {
+    const options: RequestOptionsWithAdditionalAndAccept = {
       ...common,
       ...requestOptions,
     };
@@ -220,7 +283,9 @@ export default class TypedHttpClient {
    * @returns The {@link Headers} to use for the request
    */
   private _headersFromOptions<PayloadType>(
-    requestOptions: TypedRequestOptionsWithAdditionalAndAccept<PayloadType>
+    requestOptions:
+      | RequestOptionsWithAdditionalAndAccept
+      | TypedRequestOptionsWithAdditionalAndAccept<PayloadType>
   ): Headers {
     let headers: Headers = new Headers(requestOptions.additionalHeaders);
     headers.set("accept", requestOptions.acceptHeader);
@@ -241,31 +306,24 @@ export default class TypedHttpClient {
    * @param requestOptions The request options for the request
    * @returns The object the base HttpClient will use to set up and make the actual request
    */
-  private _getRequestResources<PayloadType = undefined>(
-    requestOptions: TypedRequestOptions<PayloadType>
-  ): RequestInitSansMethod {
+  private _getRequestResources<PayloadType>(
+    requestOptions: RequestOptions | TypedRequestOptions<PayloadType>
+  ): RequestInit {
     const reqOptsWithAdditionalAndAccept =
-      this._getRequestOptionsWithAdditionalAndAccept<PayloadType>(
-        requestOptions
-      );
-    const requestInit: RequestInitSansMethodAndBody = {
-      headers: this._headersFromOptions<PayloadType>(
-        reqOptsWithAdditionalAndAccept
-      ),
+      this._getRequestOptionsWithAdditionalAndAccept(requestOptions);
+    const requestInit: RequestInit = {
+      headers: this._headersFromOptions(reqOptsWithAdditionalAndAccept),
     };
     if (
-      isTypedRequestOptionsWithPayload<PayloadType>(
+      isTypedRequestOptionsWithPayloadWithAdditionalAndAccept(
         reqOptsWithAdditionalAndAccept
       )
     ) {
       // A payload is provided and should be converted to the format required for sending over the wire.
-      const requestInitWithBody: RequestInitSansMethod = {
-        ...requestInit,
-        body: reqOptsWithAdditionalAndAccept.contentTypeHandler.getContentForRequestFromPayload(
+      requestInit.body =
+        reqOptsWithAdditionalAndAccept.contentTypeHandler.getContentForRequestFromPayload(
           reqOptsWithAdditionalAndAccept.payload
-        ),
-      };
-      return requestInitWithBody;
+        );
     }
     // No payload was provided so no need to convert it.
     return requestInit;
@@ -277,21 +335,30 @@ export default class TypedHttpClient {
    * If the content-type of the response indicates the body has JSON, this will attempt to parse that JSON
    * and provide that along with the string version and the original response to the response processor.
    *
+   * A "reviver" function can also be provided to fascilitate the JSON parsing attempt if relevant.
+   *
    * @param response the {@link Response} object provided by cross-fetch
    * @param responseProcessor the function that will be used to
+   * @param responseJsonReviver (optional) A function that transforms the results. This function is called for
+   *   each member of the object. If a member contains nested objects, the nested objects are transformed before
+   *   the parent object is.
+   * @see {@link JSON.parse} for more information on the reviver.
    * @returns the processed response of the anticipated return type
    */
   async processResponse<ReturnType>(
     response: Response,
-    responseProcessor: ResponseProcessor<ReturnType>
+    responseProcessor: ResponseProcessor<ReturnType>,
+    responseJsonReviver?: JsonReviver
   ): Promise<TypedResponse<ReturnType>> {
     // Get the body as a string first.
     let bodyContentsAsString = await response.text();
     // If the content-type indicates JSON, attempts to parse the contents as such.
     let bodyContentsAsObject: unknown;
     if (this._contentTypeIsJson(response.headers)) {
-      bodyContentsAsObject =
-        this._getParsedJSONFromResponseBodyContents(bodyContentsAsString);
+      bodyContentsAsObject = this._getParsedJSONFromResponseBodyContents(
+        bodyContentsAsString,
+        responseJsonReviver
+      );
     }
     // Process the response
     let result: ReturnType = responseProcessor(
@@ -322,14 +389,19 @@ export default class TypedHttpClient {
    * @throws {@link ResponseBodyNotJSONError} if body can't be parsed
    *
    * @param bodyContentsAsString the body contents of the response as a string
+   * @param reviver (optional) A function that transforms the results. This function is called for each member
+   *   of the object. If a member contains nested objects, the nested objects are transformed before the parent
+   *   object is.
+   * @see {@link JSON.parse} for more information on the reviver.
    * @returns the body parsed as JSON
    */
   private _getParsedJSONFromResponseBodyContents(
-    bodyContentsAsString: string
+    bodyContentsAsString: string,
+    reviver?: JsonReviver
   ): unknown {
     try {
       if (bodyContentsAsString.length > 0) {
-        return JSON.parse(bodyContentsAsString);
+        return JSON.parse(bodyContentsAsString, reviver);
       }
       return;
     } catch (err) {

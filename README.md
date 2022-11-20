@@ -153,6 +153,78 @@ try {
 
 For an example of how to define a custom error, check out the `errors.ts` module in the source code.
 
+## Revivers
+
+To simplify the processing, you may want to try to transform some primitives into more convenient types like `Date` objects, since those can't be sent over the wire in JSON. The `JSON.parse` function accepts an argument it calls a ["reviver"](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#the_reviver_parameter) that does exactly this. You can think of it like a preprocessor for the response if it's JSON.
+
+The client allows you to pass your own reviver function along with your request options if desired. And a couple `Date`-focused revivers are provided with the client that transform [ISO 8601](https://www.w3.org/TR/NOTE-datetime) formatted strings if encountered. You can define your own using them as an example. If you wish to use them, you can import them like this:
+
+```typescript
+import {
+  JsonISO8601DateReviver,
+  JsonISO8601DateAndTimeReviver,
+} from 'typed-http-client/JsonRevivers';
+```
+
+Note that the typing information is still unknown by the compiler, so the response processing function will still be very much in the dark until it actually checks, but this can save a bit of effort by making it easy to check things.
+
+Here's what using them looks like:
+
+```typescript
+const client = new TypedHttpClient("my-client");
+const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
+const requestOptions: RequestOptions = {
+  url,
+  responseJsonReviver: JsonISO8601DateAndTimeReviver, // right here
+};
+
+// The return type can be inferred from the response processor too!
+const response = await client.post(requestOptions, parseMyRawData);
+const data: MyProcessedData = response.result;
+```
+
+Of course, our `MyRawData` interface now needs to change to accomodate this update. In fact, there wouldn't be anything to do with the data if it matches up in this case, so let's just simplify things a bit and keep it to one interface:
+
+```typescript
+export interface MyData {
+  someNumber: number;
+  someDate: Date;
+}
+```
+
+Here's how our type assertion function changes:
+
+```typescript
+function assertIsMyData(value: unknown): asserts value is MyData {
+  // Check if nullish first so members can be accessed later without throwing errors.
+  if (value === null || value === undefined) {
+    throw new TypeError("Value is not MyRawData");
+  }
+  // Assign it to type any now that it is confirmed to not be nullish so the compiler doesn't
+  // complain about members not existing.
+  const obj: any = value;
+  if (!Number.isFinite(obj.member)) {
+    throw new TypeError("Value is not MyRawData");
+  } else if (!obj.someDate instanceof Date) { // right here
+    throw new TypeError("Value is not MyRawData");
+  }
+}
+```
+
+And our response processor now looks like this:
+
+```typescript
+function parseMyRawData(
+  response: Response,
+  responseBodyAsString: string,
+  responseBodyAsObject: unknown
+): MyData {
+  assertIsMyData(responseBodyAsObject);
+  // responseBodyAsObject is now recognized as `MyData`
+  return responseBodyAsObject;
+}
+```
+
 # Build and Test
 
 ## Building

@@ -13,48 +13,56 @@ export type ResponseProcessor<ReturnType> = (
   responseBodyObject: unknown
 ) => ReturnType;
 
-export interface TypedRequestOptionsBase<PayloadType = undefined> {
+/**
+ * A function used by {@link JSON.parse} to transform individual members.
+ *
+ * @see {@link JSON.parse} for more information.
+ */
+export type JsonReviver = (key: string, value: any) => any;
+
+export interface RequestOptions {
   url: URL;
   acceptHeader?: string;
-  payload?: PayloadType;
   additionalHeaders?: HeadersInit;
+  /**
+   * A function that does an initial transformation of the response results in the event that JSON is received
+   * in the response body. This function will be passed directly to {@link JSON.parse} and is called for each
+   * member of the object. If a member contains nested objects, the nested objects are transformed before the
+   * parent object is.
+   * @see {@link JSON.parse} for more information on the reviver function.
+   */
+  responseJsonReviver?: JsonReviver;
+}
+export interface TypedRequestOptionsBase<PayloadType = undefined>
+  extends RequestOptions {
+  payload?: PayloadType;
   contentTypeHandler?: ContentTypeHandler<PayloadType>;
 }
-export interface TypedRequestOptionsWithPayload<PayloadType = undefined>
+export interface TypedRequestOptions<PayloadType = undefined>
   extends TypedRequestOptionsBase<PayloadType> {
-  payload: PayloadType;
-  contentTypeHandler?: ContentTypeHandler<PayloadType>;
+  payload?: PayloadType;
 }
-export interface TypedRequestOptionsWithPayloadAndHandler<PayloadType = undefined>
+export interface TypedRequestOptionsWithPayload<PayloadType extends any>
+  extends TypedRequestOptions<PayloadType> {
+  payload: PayloadType;
+}
+export interface TypedRequestOptionsWithHandler<PayloadType extends any>
   extends TypedRequestOptionsBase<PayloadType> {
   payload: PayloadType;
   contentTypeHandler: ContentTypeHandler<PayloadType>;
 }
-/**
- * contentTypeHandler is only allowed when there is a payload to send.
- */
-export interface TypedRequestOptionsSansPayload
-  extends Omit<TypedRequestOptionsBase, "payload" | "contentTypeHandler"> {
-  contentTypeHandler?: undefined;
-}
 
-export type TypedRequestOptions<PayloadType = undefined> =
-  | TypedRequestOptionsSansPayload
-  | TypedRequestOptionsWithPayload<PayloadType>;
-
-export interface TypedRequestOptionsWithPayloadWithAdditionalAndAccept<
+export interface TypedRequestOptionsWithAdditionalAndAccept<
   PayloadType = undefined
-> extends TypedRequestOptionsWithPayloadAndHandler<PayloadType> {
+> extends TypedRequestOptionsWithHandler<PayloadType> {
   additionalHeaders: HeadersInit;
   acceptHeader: string;
 }
-export interface TypedRequestOptionsSansPayloadWithAdditionalAndAccept
-  extends TypedRequestOptionsSansPayload {
+export interface RequestOptionsWithPayload extends RequestOptions {
+  payload: any;
+  contentTypeHandler?: ContentTypeHandler<unknown>;
+}
+export interface RequestOptionsWithAdditionalAndAccept extends RequestOptions {
   additionalHeaders: HeadersInit;
   acceptHeader: string;
 }
-export type TypedRequestOptionsWithAdditionalAndAccept<
-  PayloadType = undefined
-> =
-  | TypedRequestOptionsWithPayloadWithAdditionalAndAccept<PayloadType>
-  | TypedRequestOptionsSansPayloadWithAdditionalAndAccept;

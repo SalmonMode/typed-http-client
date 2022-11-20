@@ -1,7 +1,8 @@
 import {
-    TypedRequestOptionsBase,
-    TypedRequestOptionsWithPayload,
-    TypedRequestOptionsWithPayloadWithAdditionalAndAccept
+  RequestOptions,
+  TypedRequestOptions,
+  TypedRequestOptionsWithAdditionalAndAccept,
+  TypedRequestOptionsWithPayload,
 } from "../types";
 
 /**
@@ -13,9 +14,10 @@ import {
  * @returns
  */
 export function isTypedRequestOptionsWithPayload<PayloadType>(
-  requestOptions: TypedRequestOptionsBase<PayloadType>
+  requestOptions: RequestOptions | TypedRequestOptions<PayloadType>
 ): requestOptions is TypedRequestOptionsWithPayload<PayloadType> {
-  return !!requestOptions.payload
+  return !!(requestOptions as TypedRequestOptionsWithPayload<PayloadType>)
+    .payload;
 }
 /**
  * A type predicate for narrowing type possibilities based on whether or not a payload was provided.
@@ -28,11 +30,11 @@ export function isTypedRequestOptionsWithPayload<PayloadType>(
 export function isTypedRequestOptionsWithPayloadWithAdditionalAndAccept<
   PayloadType
 >(
-  requestOptions: TypedRequestOptionsBase<PayloadType>
-): requestOptions is TypedRequestOptionsWithPayloadWithAdditionalAndAccept<PayloadType> {
+  requestOptions: RequestOptions | TypedRequestOptions<PayloadType>
+): requestOptions is TypedRequestOptionsWithAdditionalAndAccept<PayloadType> {
   return !!(
-    requestOptions.payload &&
-    requestOptions.contentTypeHandler &&
+    (requestOptions as TypedRequestOptions<PayloadType>).payload &&
+    (requestOptions as TypedRequestOptions<PayloadType>).contentTypeHandler &&
     requestOptions.acceptHeader &&
     requestOptions.additionalHeaders
   );
