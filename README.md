@@ -33,25 +33,85 @@ npm install --save typed-http-client
 
 ## Usage
 
-Let's say there's an endpoint that accepts `POST` requests that contain a JSON payload in the body, and it returns with some JSON of its own with a range of data. For now, let's assume it'll come back as JSON and the client will at least parse that much. First let's starts by making an interface that represents the anticipated shape of our raw data:
+Let's start with the meat of it. What's it like to use the results? Importing looks like this:
+
+```typescript
+import { TypedHttpClient } from 'typed-http-client';
+```
+
+Now let's take a peak at how it'll look in your code if you need to send a `POST` request to a particular endpoint that sends back some simple JSON data:
+
+```typescript
+const client = new TypedHttpClient("my-client");
+const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
+// It's not necessary to tell response or data what types they'll be as it's inferred. But
+// it's added here for clarity.
+const response: ITypedResponse<MyProcessedData> = await client.post<MyProcessedData>({ url }, parseMyRawData);
+const data: MyProcessedData = response.result;
+```
+
+You might have some questions, so let's go through it and how you can get to this point by working backwards.
+
+`client` is the HTTP client itself. Nothing fancy, except for `"my-client"` which is just the user agent that the client will be using. You can put whatever you want in there.
+
+`url` is the `URL` object that contains the information about where to make the request to. It's built in to JavaScript, so nothing to worry about there.
+
+Let's look at that third line of code without the typing:
+
+```typescript
+const response = await client.post({ url }, parseMyRawData);
+```
+
+Ultimately each, every request you make with the client needs to provide the `RequestOptions` where how to make the request (here it's just `{ url }`, but there's more options available), and a processing function that takes the raw response from the server and returns back out the data you want. You can see that response processing function, `parseMyRawData`, being passed as the second argument to the `post` method. In this case, we'll (hopefully) be receiving this in the response back from the server:
 
 ```typescript
 export interface MyRawData {
   someNumber: number;
-  someDate: string;
+  someDate: string; // this is the field we wanna transform
 }
 ```
 
-The `someDate` field represents a `Date` object, but the API is providing it as an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) string. We'll be converting it to a proper `Date` object in the response processor, but that'll be a few steps down. For now, let's define the shape of our desired data:
+And we'll be using the response processor to turn it into this:
 
 ```typescript
 export interface MyProcessedData {
   someNumber: number;
-  someDate: Date;
+  someDate: Date; // this is the field that changed
 }
 ```
 
-We don't want to get too ahead of ourselves, though, because we don't know what's coming back from the API until we actually look at it. So let's build a [type assertion function](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions) to make sure it lines up:
+We'll be turning that string field, `someDate` (which should be in ISO 8601 format), into a `Date` object.
+
+Of course, things can easily go wrong when working over a network, so we might not actually be getting back data in the shape of `MyRawData`. It might not even be a normal object with keys and stuff! It could just be a `string`, `null`, or even `undefined`! The client will grab JSON and provide it to the response processor if it can find any, but we can't know ahead of time what we'll be getting, so we have to cover our bases.
+
+To do that, let's define our response processing function, `parseMyRawData`:
+
+```typescript
+function parseMyRawData(
+  response: Response,
+  responseBodyAsString: string,
+  responseBodyAsObject: unknown
+): MyProcessedData {
+  assertIsMyRawData(responseBodyAsObject);
+  // responseBodyAsObject is now recognized as `MyRawData`
+  return {
+    someNumber: responseBodyAsObject.someNumber,
+    someDate: new Date(responseBodyAsObject.someDate),
+  }
+}
+```
+
+You probably already have more questions, so let's break this one down too. The three arguments to the function are what the client provides to all response processing functions.
+
+The first is the full `Response` object. It's exactly what the client is working with when it gets a response back from the server.
+
+The second is the response body as a string, with no processing done to it. It could very well be stringified JSON.
+
+The third is the response body as an object. It'll try to parse JSON responses if the headers indicate it's JSON, but it doesn't know what that'll look like, and if there's no headers telling it there's JSON, it won't try. That's why its type is `unknown`. It could be an object, `null`, `undefined`, a `string`, or a number of other things, so we have to be careful with it.
+
+That's where the [type assertion functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), `assertIsMyRawData`, comes in. Type assertion functions can take arguments and confirm for you (by not throwing an error) that something is a particular type. If it throws an error, it definitely isn't that type of data, but it is a real error that'll break the flow of the code so be careful with these. Then again, the errors can be a very powerful tool when combined with `try/catch` blocks.
+
+For now, let's look at `assertIsMyRawData` to see how it works:
 
 ```typescript
 function assertIsMyRawData(value: unknown): asserts value is MyRawData {
@@ -70,35 +130,17 @@ function assertIsMyRawData(value: unknown): asserts value is MyRawData {
 }
 ```
 
-Now we can use this in our processing function to get some semblance of typing early on. Any errors can be thrown here, and this can be used to your advantage as mentioned earlier. Now let's define our processing function:
+It's important that it's recognized as `unknown` first, because the compiler won't complain about referencing properties of an `any` variable, even though that can result in an error if trying to reference the property of something "nullish". Normally, you could use a "[nullish coallescing operator (??)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing)" to prevent that error from being thrown, but that can cause issues with determining code coverage when using TypeScript. So once we know it's not `null` or `undefined` (the two things that are "nullish"), we can reference it as `any` 
 
-```typescript
-function parseMyRawData(
-  response: Response,
-  responseBodyAsString: string,
-  responseBodyAsObject: unknown
-): MyProcessedData {
-  assertIsMyRawData(responseBodyAsObject);
-  // responseBodyAsObject is now recognized as `MyRawData`
-  return {
-    someNumber: responseBodyAsObject.someNumber,
-    someDate: new Date(responseBodyAsObject.someDate),
-  }
-}
-```
+Once that's taken care of though, we're able to check the individual properties to make sure they line up with our expectations. If it makes it through without throwing an error, then it must be `MyRawData` (at least as far as we're concerned about).
 
-The HTTP client provides references to the original `Response` object, the response body as a `string`, and, if it thought it could pull it out, the body of the response parsed by the `JSON` module. The client provides all this information to be convenient so you can decide how you want to parse each response using all the available information.
+Once this is executed, it tells the rest of the code in `parseMyRawData` that the variable is in fact of type `MyRawData`, so the only thing left to do is change that `someDate` field and return the result as type `MyProcessedData`.
 
-It's important to note that even with the `JSON` module parsing it, the type is still `unknown`. But the type assertion function we made makes that easy to account for. And now to put it all together:
+It's also important to note that, in this case, the type assertion function is where we need to be careful, because there's nothing inherently making sure we're checking everything we should to figure out if the incoming data is `MyRawData`. The function could be completely empty and we would be none the wiser.
 
-```typescript
-const client = new TypedHttpClient("my-client");
-const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
-// It's not necessary to tell response or data what types they'll be as it's inferred. But
-// it's added here for clarity.
-const response: ITypedResponse<MyProcessedData> = await client.post<MyProcessedData>({ url }, parseMyRawData);
-const data: MyProcessedData = response.result;
-```
+With all that covered, though, we're done. The result of the `post` method will be an object that contains a reference to the object returned by our response processing function, along with references to a few other things that might be helpful in more advanced use cases.
+
+### Payloads
 
 Now let's say the same endpoint took a JSON payload. The client comes with two content type handlers (one for JSON, and another for `x-www-form-urlencoded`), but attempts to use JSON by default. Let's define a quick interface that outlines the shape of the data we want to send to the endpoint:
 
@@ -131,7 +173,7 @@ const data: MyProcessedData = response.result;
 
 And that's it!
 
-Errors can be thrown at any point in the response processor and it'll bubble up to whatever is calling the client's methods. So you can get fancy in the processor to throw specific error depending on what went wrong so the caller can handle each one differently. That might look something like this:
+Errors can be thrown at any point in the response processor and they'll bubble up to whatever is calling the client's methods. So you can get fancy in the processor to throw specific error depending on what went wrong so the caller can handle each one differently. That might look something like this:
 
 ```typescript
 try {
