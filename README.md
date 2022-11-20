@@ -31,7 +31,7 @@ For example, you may be able to recognize when a login attempt failed because of
 npm install --save typed-http-client
 ```
 
-# Usage
+## Usage
 
 Let's say there's an endpoint that accepts `POST` requests that contain a JSON payload in the body, and it returns with some JSON of its own with a range of data. For now, let's assume it'll come back as JSON and the client will at least parse that much. First let's starts by making an interface that represents the anticipated shape of our raw data:
 
@@ -96,7 +96,7 @@ const client = new TypedHttpClient("my-client");
 const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
 // It's not necessary to tell response or data what types they'll be as it's inferred. But
 // it's added here for clarity.
-const response: ITypedResponse<MyProcessedData> = await client.post<MyProcessedData>({ url });
+const response: ITypedResponse<MyProcessedData> = await client.post<MyProcessedData>({ url }, parseMyRawData);
 const data: MyProcessedData = response.result;
 ```
 
@@ -119,10 +119,13 @@ const payload: MyPayload = {
 const client = new TypedHttpClient("my-client");
 const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
 // Specifying the payload type here helps make sure we don't accidentally pass something in we don't want to.
-const response = await client.post<MyProcessedData, MyPayload>({
-  url,
-  payload,
-});
+const response = await client.post<MyProcessedData, MyPayload>(
+  {
+    url,
+    payload,
+  },
+  parseMyRawData
+);
 const data: MyProcessedData = response.result;
 ```
 
@@ -136,7 +139,7 @@ try {
   const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
   // It's not necessary to tell response or data what types they'll be as it's inferred. But
   // it's added here for clarity.
-  const response = await client.post<MyProcessedData>({ url });
+  const response = await client.post<MyProcessedData>({ url }, parseMyRawData);
   return response.result;
 } catch (err) {
   // UnauthorizedError would be a custom error you'd define.
