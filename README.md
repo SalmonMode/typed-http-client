@@ -155,7 +155,7 @@ For an example of how to define a custom error, check out the `errors.ts` module
 
 ## Revivers
 
-To simplify the processing, you may want to try to transform some primitives into more convenient types like `Date` objects, since those can't be sent over the wire in JSON. The `JSON.parse` function accepts an argument it calls a ["reviver"](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#the_reviver_parameter) that does exactly this. You can think of it like a preprocessor for the response if it's JSON.
+To simplify the processing before it reaches your response processor, you may want to try to transform some primitives into more convenient types like `Date` objects, since those can't be sent over the wire in JSON. The `JSON.parse` function accepts an argument it calls a ["reviver"](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#the_reviver_parameter) that does exactly this. You can think of it like a preprocessor for the response if it's JSON.
 
 The client allows you to pass your own reviver function along with your request options if desired. And a couple `Date`-focused revivers are provided with the client that transform [ISO 8601](https://www.w3.org/TR/NOTE-datetime) formatted strings if encountered. You can define your own using them as an example. If you wish to use them, you can import them like this:
 
