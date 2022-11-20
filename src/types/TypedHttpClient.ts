@@ -1,7 +1,7 @@
 import { URL } from "url";
-import { IContentTypeHandler } from "./ContentTypeHandlers";
+import { ContentTypeHandler } from "./ContentTypeHandlers";
 
-export interface ITypedResponse<T> {
+export interface TypedResponse<T> {
   statusCode: number;
   result: T;
   headers: Headers;
@@ -13,45 +13,48 @@ export type ResponseProcessor<ReturnType> = (
   responseBodyObject: unknown
 ) => ReturnType;
 
-export interface ITypedRequestOptionsBase<PayloadType = undefined> {
+export interface TypedRequestOptionsBase<PayloadType = undefined> {
   url: URL;
   acceptHeader?: string;
   payload?: PayloadType;
   additionalHeaders?: HeadersInit;
-  contentTypeHandler?: IContentTypeHandler<PayloadType>;
+  contentTypeHandler?: ContentTypeHandler<PayloadType>;
 }
-export interface ITypedRequestOptionsWithPayload<PayloadType = undefined>
-  extends ITypedRequestOptionsBase<PayloadType> {
+export interface TypedRequestOptionsWithPayload<PayloadType = undefined>
+  extends TypedRequestOptionsBase<PayloadType> {
   payload: PayloadType;
-  contentTypeHandler?: IContentTypeHandler<PayloadType>;
+  contentTypeHandler?: ContentTypeHandler<PayloadType>;
 }
-export interface ITypedRequestOptionsWithPayloadAndHandler<PayloadType = undefined>
-  extends ITypedRequestOptionsBase<PayloadType> {
+export interface TypedRequestOptionsWithPayloadAndHandler<PayloadType = undefined>
+  extends TypedRequestOptionsBase<PayloadType> {
   payload: PayloadType;
-  contentTypeHandler: IContentTypeHandler<PayloadType>;
+  contentTypeHandler: ContentTypeHandler<PayloadType>;
 }
-export interface ITypedRequestOptionsSansPayload
-  extends Omit<ITypedRequestOptionsBase, "payload" | "contentTypeHandler"> {
+/**
+ * contentTypeHandler is only allowed when there is a payload to send.
+ */
+export interface TypedRequestOptionsSansPayload
+  extends Omit<TypedRequestOptionsBase, "payload" | "contentTypeHandler"> {
   contentTypeHandler?: undefined;
 }
 
-export type ITypedRequestOptions<PayloadType = undefined> =
-  | ITypedRequestOptionsSansPayload
-  | ITypedRequestOptionsWithPayload<PayloadType>;
+export type TypedRequestOptions<PayloadType = undefined> =
+  | TypedRequestOptionsSansPayload
+  | TypedRequestOptionsWithPayload<PayloadType>;
 
-export interface ITypedRequestOptionsWithPayloadWithAdditionalAndAccept<
+export interface TypedRequestOptionsWithPayloadWithAdditionalAndAccept<
   PayloadType = undefined
-> extends ITypedRequestOptionsWithPayloadAndHandler<PayloadType> {
+> extends TypedRequestOptionsWithPayloadAndHandler<PayloadType> {
   additionalHeaders: HeadersInit;
   acceptHeader: string;
 }
-export interface ITypedRequestOptionsSansPayloadWithAdditionalAndAccept
-  extends ITypedRequestOptionsSansPayload {
+export interface TypedRequestOptionsSansPayloadWithAdditionalAndAccept
+  extends TypedRequestOptionsSansPayload {
   additionalHeaders: HeadersInit;
   acceptHeader: string;
 }
-export type ITypedRequestOptionsWithAdditionalAndAccept<
+export type TypedRequestOptionsWithAdditionalAndAccept<
   PayloadType = undefined
 > =
-  | ITypedRequestOptionsWithPayloadWithAdditionalAndAccept<PayloadType>
-  | ITypedRequestOptionsSansPayloadWithAdditionalAndAccept;
+  | TypedRequestOptionsWithPayloadWithAdditionalAndAccept<PayloadType>
+  | TypedRequestOptionsSansPayloadWithAdditionalAndAccept;

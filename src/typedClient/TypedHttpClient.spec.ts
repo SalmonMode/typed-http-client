@@ -5,7 +5,7 @@ import { Body } from "nock/types";
 import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
 import { ResponseBodyNotJSONError } from "../errors";
 import { isNullish, isString } from "../typePredicates";
-import { ITypedResponse } from "../types";
+import { TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
 
 var expect = chai.expect;
@@ -60,7 +60,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<undefined>;
+    let restRes: TypedResponse<undefined>;
 
     describe("With query string", function () {
       let requestUri: string;
@@ -180,7 +180,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<ResponseData>;
+    let restRes: TypedResponse<ResponseData>;
 
     describe("With query string", function () {
       let requestUri: string;
@@ -375,7 +375,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<ResponseData>;
+    let restRes: TypedResponse<ResponseData>;
 
     describe("With body", function () {
       let payload = {
@@ -542,7 +542,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<ResponseData>;
+    let restRes: TypedResponse<ResponseData>;
 
     describe("With body", function () {
       let payload = {
@@ -705,7 +705,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<ResponseData>;
+    let restRes: TypedResponse<ResponseData>;
 
     describe("With body", function () {
       let payload = {
@@ -868,7 +868,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<ResponseData>;
+    let restRes: TypedResponse<ResponseData>;
 
     describe("With body", function () {
       let payload = {
@@ -1031,7 +1031,7 @@ describe("TypedHttpClient", function () {
     let requestBody: Body;
     let requestMethod: string;
     let requestHeaders: Headers;
-    let restRes: ITypedResponse<ResponseData>;
+    let restRes: TypedResponse<ResponseData>;
 
     describe("With body", function () {
       let payload = {

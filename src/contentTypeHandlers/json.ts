@@ -1,6 +1,6 @@
 import {
   ContentTypeHeaderString,
-  IContentTypeHandler,
+  ContentTypeHandler,
   MediaTypeCategory,
   NodeSupportedEncoding,
 } from "../types";
@@ -10,7 +10,7 @@ import {
  *
  * Converts whatever payload is provided into a string via JSON.stringify.
  */
-const JSONContentTypeHandler: IContentTypeHandler<any> = {
+const JSONContentTypeHandler: ContentTypeHandler<any> = {
   mediaType: `${MediaTypeCategory.Application}/json`,
   charset: NodeSupportedEncoding.UTF8,
   get header(): ContentTypeHeaderString {

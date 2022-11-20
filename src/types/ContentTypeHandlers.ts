@@ -19,7 +19,7 @@ export type ContentTypeHeaderString =
  * and to transform the request body appropriately.
  *
  */
-export interface IContentTypeHandler<T> {
+export interface ContentTypeHandler<T> {
   mediaType: MediaTypeString;
   charset: NodeSupportedEncoding;
   header: ContentTypeHeaderString;

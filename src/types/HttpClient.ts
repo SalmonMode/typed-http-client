@@ -34,7 +34,7 @@ export interface PatchRequestInit extends RequestInit {
 export interface PutRequestInit extends RequestInit {
   method: HttpMethod.PUT;
 }
-export type IRequestInit =
+export type MethodSpecificRequestInit =
   | HeadRequestInit
   | OptionsRequestInit
   | GetRequestInit
@@ -42,14 +42,3 @@ export type IRequestInit =
   | PostRequestInit
   | PatchRequestInit
   | PutRequestInit;
-
-export interface IHttpClient {
-  head(requestUrl: URL, requestInit: RequestInitSansMethodAndBody): Promise<Response>;
-  options(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  get(requestUrl: URL, requestInit: RequestInitSansMethodAndBody): Promise<Response>;
-  delete(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  post(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  patch(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  put(requestUrl: URL, requestInit: RequestInitSansMethod): Promise<Response>;
-  request(requestUrl: URL, requestInit: IRequestInit): Promise<Response>;
-}

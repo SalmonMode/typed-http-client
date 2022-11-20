@@ -1,5 +1,5 @@
 import {
-  IContentTypeHandler,
+  ContentTypeHandler,
   MediaTypeCategory,
   NodeSupportedEncoding,
   ContentTypeHeaderString,
@@ -10,7 +10,7 @@ import {
  *
  * Converts the payload (which should be a simple key value pair object) to URL encoding.
  */
-const WWWFormEncodedContentTypeHandler: IContentTypeHandler<
+const WWWFormEncodedContentTypeHandler: ContentTypeHandler<
   Record<string, any>
 > = {
   mediaType: `${MediaTypeCategory.Application}/x-www-form-urlencoded`,

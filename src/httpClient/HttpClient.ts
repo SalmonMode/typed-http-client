@@ -3,23 +3,22 @@ import {
   DeleteRequestInit,
   GetRequestInit,
   HeadRequestInit,
-  IHttpClient,
-  IRequestInit,
+  HttpMethod,
+  MethodSpecificRequestInit,
   OptionsRequestInit,
   PatchRequestInit,
   PostRequestInit,
   PutRequestInit,
   RequestInitSansMethod,
-  HttpMethod,
   RequestInitSansMethodAndBody,
 } from "../types";
 
-export default class HttpClient implements IHttpClient {
+export default class HttpClient {
   /**
    * Creates an instance of the {@link HttpClient} class.
-   * 
+   *
    * This is a bare bones abstraction around cross-fetch, meant to provide some simple interfaces for making HTTP requests.
-   * 
+   *
    * @constructor
    * @param userAgent The user agent to use for all requests
    */
@@ -27,6 +26,8 @@ export default class HttpClient implements IHttpClient {
 
   /**
    * Make a HEAD request.
+   * 
+   * Note: HEAD requests cannot contain bodies, and so any body provided in the RequestInit will be ignored.
    *
    * @param requestUrl The URL to make the request to
    * @param requestInit The settings for how the request should be made
@@ -38,8 +39,8 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: HeadRequestInit = {
       ...requestInit,
-      method: HttpMethod.HEAD
-    }
+      method: HttpMethod.HEAD,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
@@ -56,13 +57,15 @@ export default class HttpClient implements IHttpClient {
   ): Promise<Response> {
     const requestInitWithMethod: OptionsRequestInit = {
       ...requestInit,
-      method: HttpMethod.OPTIONS
-    }
+      method: HttpMethod.OPTIONS,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
   /**
    * Make a GET request.
+   * 
+   * Note: GET requests cannot contain bodies, and so any body provided in the RequestInit will be ignored.
    *
    * @param requestUrl The URL to make the request to
    * @param requestInit The settings for how the request should be made
@@ -70,12 +73,12 @@ export default class HttpClient implements IHttpClient {
    */
   public async get(
     requestUrl: URL,
-    requestInit: RequestInitSansMethodAndBody = { }
+    requestInit: RequestInitSansMethodAndBody = {}
   ): Promise<Response> {
     const requestInitWithMethod: GetRequestInit = {
       ...requestInit,
-      method: HttpMethod.GET
-    }
+      method: HttpMethod.GET,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
@@ -88,12 +91,12 @@ export default class HttpClient implements IHttpClient {
    */
   public async delete(
     requestUrl: URL,
-    requestInit: RequestInitSansMethod = { }
+    requestInit: RequestInitSansMethod = {}
   ): Promise<Response> {
     const requestInitWithMethod: DeleteRequestInit = {
       ...requestInit,
-      method: HttpMethod.DELETE
-    }
+      method: HttpMethod.DELETE,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
@@ -106,12 +109,12 @@ export default class HttpClient implements IHttpClient {
    */
   public async post(
     requestUrl: URL,
-    requestInit: RequestInitSansMethod = { }
+    requestInit: RequestInitSansMethod = {}
   ): Promise<Response> {
     const requestInitWithMethod: PostRequestInit = {
       ...requestInit,
-      method: HttpMethod.POST
-    }
+      method: HttpMethod.POST,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
@@ -124,12 +127,12 @@ export default class HttpClient implements IHttpClient {
    */
   public async patch(
     requestUrl: URL,
-    requestInit: RequestInitSansMethod = { }
+    requestInit: RequestInitSansMethod = {}
   ): Promise<Response> {
     const requestInitWithMethod: PatchRequestInit = {
       ...requestInit,
-      method: HttpMethod.PATCH
-    }
+      method: HttpMethod.PATCH,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
@@ -142,12 +145,12 @@ export default class HttpClient implements IHttpClient {
    */
   public async put(
     requestUrl: URL,
-    requestInit: RequestInitSansMethod = { }
+    requestInit: RequestInitSansMethod = {}
   ): Promise<Response> {
     const requestInitWithMethod: PutRequestInit = {
       ...requestInit,
-      method: HttpMethod.PUT
-    }
+      method: HttpMethod.PUT,
+    };
     return await this.request(requestUrl, requestInitWithMethod);
   }
 
@@ -157,12 +160,12 @@ export default class HttpClient implements IHttpClient {
    * The normal get, post, patch, et all methods should be preferred.
    *
    * @param requestUrl The URL to make the request to
-   * @param requestInit The {@link IRequestInit} settings for how the request should be made
+   * @param requestInit The {@link MethodSpecificRequestInit} settings for how the request should be made
    * @returns a {@link Response} object
    */
   public async request(
     requestUrl: URL,
-    requestInit: IRequestInit
+    requestInit: MethodSpecificRequestInit
   ): Promise<Response> {
     // make copy of requestInit to make sure the original is maintained
     let copyOfRequestInit: RequestInit = { ...requestInit };
