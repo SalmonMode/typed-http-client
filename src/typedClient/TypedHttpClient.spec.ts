@@ -44,6 +44,16 @@ function parseRawResponseData(
   );
 }
 
+const standardUrl = new URL("https://localhost:80");
+let payload = {
+  something: "hello",
+  other: "world",
+};
+const urlWithQueryString = new URL("https://localhost:80");
+for (let [key, value] of Object.entries(payload)) {
+  urlWithQueryString.searchParams.set(key, value);
+}
+
 describe("TypedHttpClient", function () {
   describe("HEAD requests", function () {
     let client: TypedHttpClient;
@@ -59,10 +69,7 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .head(new RegExp("/.*"))
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -72,8 +79,8 @@ describe("TypedHttpClient", function () {
             requestUri = uri;
             return { status: "ok" };
           });
-        restRes = await client.head("https://localhost:80", {
-          queryParameters: payload,
+        restRes = await client.head({
+          url: urlWithQueryString,
         });
       });
 
@@ -101,10 +108,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .head("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -113,7 +117,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.head("https://localhost:80");
+        restRes = await client.head({ url: standardUrl });
       });
 
       after(function () {
@@ -135,10 +139,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .head("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -147,7 +148,8 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.head("https://localhost:80", {
+        restRes = await client.head({
+          url: standardUrl,
           additionalHeaders: { "extra-header": "3" },
         });
       });
@@ -187,25 +189,25 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get(new RegExp("/.*"))
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
-            requestHeaders = new Headers(this.req.headers);
-            requestMethod = this.req.method;
-            requestBody = reqBody;
-            requestUri = uri;
-            return { status: "ok" };
-          }, {
-            "content-type": "application/json"
-          });
+          .reply(
+            200,
+            function (uri: string, reqBody: Body): ResponseData {
+              requestHeaders = new Headers(this.req.headers);
+              requestMethod = this.req.method;
+              requestBody = reqBody;
+              requestUri = uri;
+              return { status: "ok" };
+            },
+            {
+              "content-type": "application/json",
+            }
+          );
         restRes = await client.get<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { queryParameters: payload }
+          { url: urlWithQueryString },
+          parseRawResponseData
         );
       });
 
@@ -233,10 +235,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -246,7 +245,7 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.get<ResponseData>(
-          "https://localhost:80",
+          { url: standardUrl },
           parseRawResponseData
         );
       });
@@ -270,10 +269,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -283,9 +279,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.get<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { additionalHeaders: { "extra-header": "3" } }
+          { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
+          parseRawResponseData
         );
       });
 
@@ -311,13 +306,8 @@ describe("TypedHttpClient", function () {
     });
     describe("Empty string for response with text content type", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
-        nock("https://localhost:80")
-          .get("/")
-          .reply(200, "");
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80").get("/").reply(200, "");
       });
 
       after(function () {
@@ -326,19 +316,16 @@ describe("TypedHttpClient", function () {
 
       it("throws TypeError", async function () {
         await expect(
-          client.get<ResponseData>("https://localhost:80", parseRawResponseData)
+          client.get<ResponseData>({ url: standardUrl }, parseRawResponseData)
         ).to.eventually.be.rejectedWith(TypeError);
       });
     });
     describe("Empty string for response with JSON content type", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
-          .reply(200, "", {"content-type": "application/json"});
+          .reply(200, "", { "content-type": "application/json" });
       });
 
       after(function () {
@@ -347,7 +334,7 @@ describe("TypedHttpClient", function () {
 
       it("throws TypeError", async function () {
         await expect(
-          client.get<ResponseData>("https://localhost:80", parseRawResponseData)
+          client.get<ResponseData>({ url: standardUrl }, parseRawResponseData)
         ).to.eventually.be.rejectedWith(TypeError);
       });
     });
@@ -357,18 +344,19 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
-          .reply(200, function (uri: string, reqBody: Body): string {
-            requestHeaders = new Headers(this.req.headers);
-            requestMethod = this.req.method;
-            requestBody = reqBody;
-            return "{";
-          }, {"content-type": "application/json"});
+          .reply(
+            200,
+            function (uri: string, reqBody: Body): string {
+              requestHeaders = new Headers(this.req.headers);
+              requestMethod = this.req.method;
+              requestBody = reqBody;
+              return "{";
+            },
+            { "content-type": "application/json" }
+          );
       });
 
       after(function () {
@@ -377,7 +365,7 @@ describe("TypedHttpClient", function () {
 
       it("throws ResponseBodyNotJSONError", async function () {
         await expect(
-          client.get<ResponseData>("https://localhost:80", parseRawResponseData)
+          client.get<ResponseData>({ url: standardUrl }, parseRawResponseData)
         ).to.eventually.be.rejectedWith(ResponseBodyNotJSONError);
       });
     });
@@ -395,10 +383,7 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -408,9 +393,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.post<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { payload }
+          { url: standardUrl, payload },
+          parseRawResponseData
         );
       });
 
@@ -435,10 +419,7 @@ describe("TypedHttpClient", function () {
     });
     describe("With body and options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -448,13 +429,13 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.post<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
           {
+            url: standardUrl,
             payload: { something: "hello", other: "world" },
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
-          }
+          },
+          parseRawResponseData
         );
       });
 
@@ -482,20 +463,21 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
-            requestHeaders = new Headers(this.req.headers);
-            requestMethod = this.req.method;
-            requestBody = reqBody;
-            return { status: "ok" };
-          }, {"content-type": "application/json"});
+          .reply(
+            200,
+            function (uri: string, reqBody: Body): ResponseData {
+              requestHeaders = new Headers(this.req.headers);
+              requestMethod = this.req.method;
+              requestBody = reqBody;
+              return { status: "ok" };
+            },
+            { "content-type": "application/json" }
+          );
         restRes = await client.post<ResponseData>(
-          "https://localhost:80",
+          { url: standardUrl },
           parseRawResponseData
         );
       });
@@ -519,10 +501,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -532,9 +511,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.post<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { additionalHeaders: { "extra-header": "3" } }
+          { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
+          parseRawResponseData
         );
       });
 
@@ -572,10 +550,7 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -585,9 +560,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.put<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { payload }
+          { url: standardUrl, payload },
+          parseRawResponseData
         );
       });
 
@@ -612,10 +586,7 @@ describe("TypedHttpClient", function () {
     });
     describe("With body and options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -625,13 +596,13 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.put<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
           {
+            url: standardUrl,
             payload: { something: "hello", other: "world" },
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
-          }
+          },
+          parseRawResponseData
         );
       });
 
@@ -659,10 +630,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -672,7 +640,7 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.put<ResponseData>(
-          "https://localhost:80",
+          { url: standardUrl },
           parseRawResponseData
         );
       });
@@ -696,10 +664,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -709,9 +674,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.put<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { additionalHeaders: { "extra-header": "3" } }
+          { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
+          parseRawResponseData
         );
       });
 
@@ -749,10 +713,7 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -762,9 +723,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.patch<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { payload }
+          { url: standardUrl, payload },
+          parseRawResponseData
         );
       });
 
@@ -789,10 +749,7 @@ describe("TypedHttpClient", function () {
     });
     describe("With body and options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -802,13 +759,13 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.patch<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
           {
+            url: standardUrl,
             payload: { something: "hello", other: "world" },
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
-          }
+          },
+          parseRawResponseData
         );
       });
 
@@ -836,10 +793,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -849,7 +803,7 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.patch<ResponseData>(
-          "https://localhost:80",
+          { url: standardUrl },
           parseRawResponseData
         );
       });
@@ -873,10 +827,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -886,9 +837,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.patch<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { additionalHeaders: { "extra-header": "3" } }
+          { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
+          parseRawResponseData
         );
       });
 
@@ -926,10 +876,7 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -939,9 +886,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.options<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { payload }
+          { url: standardUrl, payload },
+          parseRawResponseData
         );
       });
 
@@ -966,10 +912,7 @@ describe("TypedHttpClient", function () {
     });
     describe("With body and options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -979,13 +922,13 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.options<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
           {
+            url: standardUrl,
             payload: { something: "hello", other: "world" },
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
-          }
+          },
+          parseRawResponseData
         );
       });
 
@@ -1013,10 +956,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -1026,7 +966,7 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.options<ResponseData>(
-          "https://localhost:80",
+          { url: standardUrl },
           parseRawResponseData
         );
       });
@@ -1050,10 +990,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -1063,9 +1000,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.options<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { additionalHeaders: { "extra-header": "3" } }
+          { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
+          parseRawResponseData
         );
       });
 
@@ -1103,10 +1039,7 @@ describe("TypedHttpClient", function () {
         other: "world",
       };
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -1116,9 +1049,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.delete<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { payload }
+          { url: standardUrl, payload },
+          parseRawResponseData
         );
       });
 
@@ -1143,10 +1075,7 @@ describe("TypedHttpClient", function () {
     });
     describe("With body and options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -1156,13 +1085,13 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.delete<ResponseData, Record<string, any>>(
-          "https://localhost:80",
-          parseRawResponseData,
           {
+            url: standardUrl,
             payload: { something: "hello", other: "world" },
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
-          }
+          },
+          parseRawResponseData
         );
       });
 
@@ -1190,10 +1119,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -1203,7 +1129,7 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.delete<ResponseData>(
-          "https://localhost:80",
+          { url: standardUrl },
           parseRawResponseData
         );
       });
@@ -1227,10 +1153,7 @@ describe("TypedHttpClient", function () {
     });
     describe("Without body and with options", function () {
       before(async function () {
-        client = new TypedHttpClient(
-          "typed-http-client-tests",
-          "https://localhost:80"
-        );
+        client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
           .reply(200, function (uri: string, reqBody: Body): ResponseData {
@@ -1240,9 +1163,8 @@ describe("TypedHttpClient", function () {
             return { status: "ok" };
           });
         restRes = await client.delete<ResponseData>(
-          "https://localhost:80",
-          parseRawResponseData,
-          { additionalHeaders: { "extra-header": "3" } }
+          { url: standardUrl, additionalHeaders: { "extra-header": "3" } },
+          parseRawResponseData
         );
       });
 

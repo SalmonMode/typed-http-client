@@ -3,7 +3,6 @@ import { JSONContentTypeHandler } from "../contentTypeHandlers";
 import { ResponseBodyNotJSONError } from "../errors";
 import { HttpClient } from "../httpClient";
 import {
-  IRequestQueryParams,
   ITypedRequestOptions,
   ITypedRequestOptionsBase,
   ITypedRequestOptionsSansPayload,
@@ -43,37 +42,29 @@ import {
  */
 export default class TypedHttpClient {
   client: HttpClient;
-  baseUrl?: string;
 
   /**
-   * Creates an instance of the RestClient
+   * Creates an instance of the HTTP client.
    *
    * @constructor
    * @param {string} userAgent - userAgent for requests
-   * @param {string} baseUrl - (Optional) If not specified, use full urls per request. If supplied and a function passes a relative url, it will be appended to this
    */
-  constructor(userAgent: string, baseUrl?: string) {
+  constructor(userAgent: string) {
     this.client = new HttpClient(userAgent);
-    this.baseUrl = baseUrl;
   }
 
   /**
    * Performs a HEAD request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {ITypedRequestOptionsSansPayload} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async head(
-    requestUrl: string,
-    requestOptions: ITypedRequestOptionsSansPayload = {}
+    requestOptions: ITypedRequestOptionsSansPayload
   ): Promise<ITypedResponse<undefined>> {
     let requestInit = this._getRequestResources(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.head(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return {
@@ -86,22 +77,17 @@ export default class TypedHttpClient {
   /**
    * Performs an OPTIONS request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {IRequestOptions} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async options<ReturnType, PayloadType = undefined>(
-    requestUrl: string,
-    responseProcessor: ResponseProcessor<ReturnType>,
-    requestOptions: ITypedRequestOptions<PayloadType> = {}
+    requestOptions: ITypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<ITypedResponse<ReturnType>> {
     let requestInit: RequestInitSansMethod =
       this._getRequestResources<PayloadType>(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.options(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return this.processResponse<ReturnType>(response, responseProcessor);
@@ -110,22 +96,17 @@ export default class TypedHttpClient {
   /**
    * Performs a GET request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {ITypedRequestOptionsSansPayload} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async get<ReturnType>(
-    requestUrl: string,
-    responseProcessor: ResponseProcessor<ReturnType>,
-    requestOptions: ITypedRequestOptionsSansPayload = {}
+    requestOptions: ITypedRequestOptionsSansPayload,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<ITypedResponse<ReturnType>> {
     let requestInit: RequestInitSansMethodAndBody =
       this._getRequestResources(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.get(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return this.processResponse<ReturnType>(response, responseProcessor);
@@ -134,46 +115,36 @@ export default class TypedHttpClient {
   /**
    * Performs a POST request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {ITypedRequestOptions} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async post<ReturnType, PayloadType = undefined>(
-    requestUrl: string,
-    responseProcessor: ResponseProcessor<ReturnType>,
-    requestOptions: ITypedRequestOptions<PayloadType> = {}
+    requestOptions: ITypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<ITypedResponse<ReturnType>> {
     let requestInit: RequestInitSansMethod =
       this._getRequestResources<PayloadType>(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.post(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return this.processResponse<ReturnType>(response, responseProcessor);
   }
 
   /**
-   * Performs a POST request to the provided URL.
+   * Performs a PUT request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {ITypedRequestOptions} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async put<ReturnType, PayloadType = undefined>(
-    requestUrl: string,
-    responseProcessor: ResponseProcessor<ReturnType>,
-    requestOptions: ITypedRequestOptions<PayloadType> = {}
+    requestOptions: ITypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<ITypedResponse<ReturnType>> {
     let requestInit: RequestInitSansMethod =
       this._getRequestResources<PayloadType>(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.put(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return this.processResponse<ReturnType>(response, responseProcessor);
@@ -182,22 +153,17 @@ export default class TypedHttpClient {
   /**
    * Performs a PATCH request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {ITypedRequestOptions} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async patch<ReturnType, PayloadType = undefined>(
-    requestUrl: string,
-    responseProcessor: ResponseProcessor<ReturnType>,
-    requestOptions: ITypedRequestOptions<PayloadType> = {}
+    requestOptions: ITypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<ITypedResponse<ReturnType>> {
     let requestInit: RequestInitSansMethod =
       this._getRequestResources<PayloadType>(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.patch(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return this.processResponse<ReturnType>(response, responseProcessor);
@@ -206,22 +172,17 @@ export default class TypedHttpClient {
   /**
    * Performs a DELETE request to the provided URL.
    *
-   * @param {string} requestUrl - fully qualified or relative url
-   * @param {ITypedRequestOptions} requestOptions - (optional) requestOptions object
+   * @param requestOptions the details for the request to be made
+   * @returns an object containing information about the response
    */
   public async delete<ReturnType, PayloadType = undefined>(
-    requestUrl: string,
-    responseProcessor: ResponseProcessor<ReturnType>,
-    requestOptions: ITypedRequestOptions<PayloadType> = {}
+    requestOptions: ITypedRequestOptions<PayloadType>,
+    responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<ITypedResponse<ReturnType>> {
     let requestInit: RequestInitSansMethod =
       this._getRequestResources<PayloadType>(requestOptions);
-    let requestUrlObject: URL = this._getPreparedUrl(
-      requestUrl,
-      requestOptions.queryParameters
-    );
     let response: Response = await this.client.delete(
-      requestUrlObject,
+      requestOptions.url,
       requestInit
     );
     return this.processResponse<ReturnType>(response, responseProcessor);
@@ -279,7 +240,6 @@ export default class TypedHttpClient {
   /**
    * Format the data and request details into a digestible format for the base HttpClient.
    *
-   * @param requestUrl The URL to make the request to
    * @param requestOptions The request options for the request
    * @returns The object the base HttpClient will use to set up and make the actual request
    */
@@ -356,26 +316,6 @@ export default class TypedHttpClient {
       result: result,
       headers: response.headers,
     };
-  }
-
-  /**
-   * Take the request URL string and the request options, and add any query string provided.
-   *
-   * @param requestUrl The string of the URL
-   * @param requestOptions the request options
-   * @returns The {@link URL} that was potentially prepared with the query string
-   */
-  private _getPreparedUrl(
-    requestUrl: string,
-    queryParameters?: IRequestQueryParams
-  ): URL {
-    let requestUrlObject: URL = new URL(requestUrl, this.baseUrl);
-    if (queryParameters) {
-      for (let key in queryParameters) {
-        requestUrlObject.searchParams.set(key, queryParameters[key]);
-      }
-    }
-    return requestUrlObject;
   }
 
   /**

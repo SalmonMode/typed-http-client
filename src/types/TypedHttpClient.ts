@@ -1,17 +1,5 @@
+import { URL } from "url";
 import { IContentTypeHandler } from "./ContentTypeHandlers";
-
-export interface IRequestOptions {
-  headers?: Headers;
-  socketTimeout?: number;
-  allowRedirects?: boolean;
-  allowRedirectDowngrade?: boolean;
-  maxRedirects?: number;
-  maxSockets?: number;
-  keepAlive?: boolean;
-  presignedUrlPatterns?: RegExp[];
-}
-
-export type IRequestQueryParams = Record<string, string>;
 
 export interface ITypedResponse<T> {
   statusCode: number;
@@ -26,19 +14,10 @@ export type ResponseProcessor<ReturnType> = (
 ) => ReturnType;
 
 export interface ITypedRequestOptionsBase<PayloadType = undefined> {
+  url: URL;
   acceptHeader?: string;
   payload?: PayloadType;
   additionalHeaders?: HeadersInit;
-
-  contentTypeHandler?: IContentTypeHandler<PayloadType>;
-  queryParameters?: IRequestQueryParams;
-}
-
-export interface ITypedRequestOptionsBase<PayloadType = undefined> {
-  acceptHeader?: string;
-  payload?: PayloadType;
-  additionalHeaders?: HeadersInit;
-  queryParameters?: IRequestQueryParams;
   contentTypeHandler?: IContentTypeHandler<PayloadType>;
 }
 export interface ITypedRequestOptionsWithPayload<PayloadType = undefined>
