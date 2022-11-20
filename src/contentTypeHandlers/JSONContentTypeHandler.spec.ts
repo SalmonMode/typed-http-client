@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import JSONContentTypeHandler from "./json";
+import JSONContentTypeHandler from "./JSONContentTypeHandler";
 
 var expect = chai.expect;
 

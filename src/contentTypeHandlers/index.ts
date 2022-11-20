@@ -1,2 +1,2 @@
-export { default as JSONContentTypeHandler } from "./json";
-export { default as WWWFormEncodedContentTypeHandler } from "./wwwFormEncoded";
+export { default as JSONContentTypeHandler } from "./JSONContentTypeHandler";
+export { default as WWWFormEncodedContentTypeHandler } from "./WWWFormEncodedContentTypeHandler";

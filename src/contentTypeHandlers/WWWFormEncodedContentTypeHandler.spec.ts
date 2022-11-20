@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import WWWFormEncodedContentTypeHandler from "./wwwFormEncoded";
+import WWWFormEncodedContentTypeHandler from "./WWWFormEncodedContentTypeHandler";
 
 var expect = chai.expect;
 
