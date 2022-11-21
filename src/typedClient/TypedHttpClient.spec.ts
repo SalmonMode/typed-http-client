@@ -6,7 +6,7 @@ import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
 import { ResponseBodyNotJSONError } from "../errors";
 import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers";
 import { hasProperty, isString } from "../typePredicates";
-import { TypedResponse } from "../types";
+import { ResponseProcessorParams, TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
 
 var expect = chai.expect;
@@ -31,16 +31,12 @@ function isRawResponseData(value: unknown): value is RawResponseData {
   return hasProperty(value, "status") && isString(value.status);
 }
 
-function parseRawResponseData(
-  response: Response,
-  responseBodyAsString: string,
-  rawResponseData: unknown
-): ResponseData {
-  if (isRawResponseData(rawResponseData)) {
-    return { ...rawResponseData };
+function parseRawResponseData({responseBodyAsObject}: ResponseProcessorParams): ResponseData {
+  if (isRawResponseData(responseBodyAsObject)) {
+    return { ...responseBodyAsObject };
   }
   throw new TypeError(
-    `Response body is not RawResponseData: ${JSON.stringify(rawResponseData)}`
+    `Response body is not RawResponseData: ${JSON.stringify(responseBodyAsObject)}`
   );
 }
 

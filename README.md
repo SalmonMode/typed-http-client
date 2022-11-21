@@ -87,17 +87,17 @@ Of course, things can easily go wrong when working over a network, so we might n
 To do that, let's define our response processing function, `parseMyRawData`:
 
 ```typescript
-function parseMyRawData(
-  response: Response,
-  responseBodyAsString: string,
-  responseBodyAsObject: unknown
-): MyProcessedData {
+function parseMyRawData({
+  response,
+  responseBodyAsString,
+  responseBodyAsObject,
+}: ResponseProcessorParams): MyProcessedData {
   assertIsMyRawData(responseBodyAsObject);
   // responseBodyAsObject is now recognized as `MyRawData`
   return {
     someNumber: responseBodyAsObject.someNumber,
     someDate: new Date(responseBodyAsObject.someDate),
-  }
+  };
 }
 ```
 

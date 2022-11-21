@@ -361,10 +361,10 @@ export default class TypedHttpClient {
       );
     }
     // Process the response
-    let result: ReturnType = responseProcessor(
+    let result: ReturnType = responseProcessor({
       response,
-      bodyContentsAsString,
-      bodyContentsAsObject
+      responseBodyAsString: bodyContentsAsString,
+      responseBodyAsObject: bodyContentsAsObject,}
     );
     return {
       statusCode: response.status,

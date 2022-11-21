@@ -7,10 +7,29 @@ export interface TypedResponse<T> {
   headers: Headers;
 }
 
+export interface ResponseProcessorParams {
+  /**
+   * The original {@link Response} object.
+   */
+  response: Response;
+  /**
+   * The body of the response as a string.
+   *
+   * If no body was returned, this will just be an empty string.
+   */
+  responseBodyAsString: string;
+  /**
+   * The body of the response as an object.
+   *
+   * This is only provided if the Content-Type header indicates the body
+   * is JSON and it was able to successfully parse the JSON using
+   * {@link JSON.parse}.
+   */
+  responseBodyAsObject: unknown;
+}
+
 export type ResponseProcessor<ReturnType> = (
-  response: Response,
-  responseBodyString: string,
-  responseBodyObject: unknown
+  responseData: ResponseProcessorParams
 ) => ReturnType;
 
 /**
