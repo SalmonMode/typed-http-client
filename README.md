@@ -56,7 +56,7 @@ You might have some questions, so let's go through it and how you can get to thi
 
 `url` is the `URL` object that contains the information about where to make the request to. It's built in to JavaScript, so nothing to worry about there.
 
-Let's look at that third line of code without the typing:
+Let's look at that third line of code without the explicit typing (it can be inferred based on the arguments passed anyway):
 
 ```typescript
 const response = await client.post({ url }, parseMyRawData);
@@ -109,30 +109,29 @@ The second is the response body as a string, with no processing done to it. It c
 
 The third is the response body as an object. It'll try to parse JSON responses if the headers indicate it's JSON, but it doesn't know what that'll look like, and if there's no headers telling it there's JSON, it won't try. That's why its type is `unknown`. It could be an object, `null`, `undefined`, a `string`, or a number of other things, so we have to be careful with it.
 
-That's where the [type assertion functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), `assertIsMyRawData`, comes in. Type assertion functions can take arguments and confirm for you (by not throwing an error) that something is a particular type. If it throws an error, it definitely isn't that type of data, but it is a real error that'll break the flow of the code so be careful with these. Then again, the errors can be a very powerful tool when combined with `try/catch` blocks.
+That's where the [type assertion function](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), `assertIsMyRawData`, comes in. Type assertion functions can take arguments and confirm for you (by not throwing an error) that something is a particular type. If it throws an error, it definitely isn't that type of data, but it is a real error that'll break the flow of the code so be careful with these. Then again, the errors can be a very powerful tool when combined with `try/catch` blocks.
 
 For now, let's look at `assertIsMyRawData` to see how it works:
 
 ```typescript
 function assertIsMyRawData(value: unknown): asserts value is MyRawData {
-  // Check if nullish first so members can be accessed later without throwing errors.
-  if (value === null || value === undefined) {
+  if (!value) {
     throw new TypeError("Value is not MyRawData");
-  }
-  // Assign it to type any now that it is confirmed to not be nullish so the compiler doesn't
-  // complain about members not existing.
-  const obj: any = value;
-  if (!Number.isFinite(obj.member)) {
+  } else if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
     throw new TypeError("Value is not MyRawData");
-  } else if (typeof obj.someDate !== "string") {
+  } else if (!hasProperty(value, "someDate") || typeof value.someDate !== "string") {
     throw new TypeError("Value is not MyRawData");
   }
 }
 ```
 
-It's important that it's recognized as `unknown` first, because the compiler won't complain about referencing properties of an `any` variable, even though that can result in an error if trying to reference the property of something "nullish". Normally, you could use a "[nullish coallescing operator (??)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing)" to prevent that error from being thrown, but that can cause issues with determining code coverage when using TypeScript. So once we know it's not `null` or `undefined` (the two things that are "nullish"), we can reference it as `any` 
+It's important that it's recognized as `unknown` first. This is because it's "illegal" to perform any operations on anything of type `unknown`. Everything should be assumed to be `unknown` unless we can confirm otherwise for maximum type safety.
 
-Once that's taken care of though, we're able to check the individual properties to make sure they line up with our expectations. If it makes it through without throwing an error, then it must be `MyRawData` (at least as far as we're concerned about).
+Another risk is that `null` and `undefined` are "nullish", which means that if we try to reference a property on them, a `TypeError` will be thrown. We could've used `value === null || value === undefined`, but `!value` is shorter and covers more things we don't need to worry about (we aren't looking for anything "falsy").
+
+Even though we've ruled out errors being thrown when trying to access properties, the compiler will still complain about referencing properties it doesn't know are there. `hasProperty` (provided by `typed-http-client`) tells the compiler that the property exists, but the property type is still `unknown`.
+
+Once the property is confirmed to exist, we can check its type, and repeat the process for the other property. If it makes it through without throwing an error, then it's all good!
 
 Once this is executed, it tells the rest of the code in `parseMyRawData` that the variable is in fact of type `MyRawData`, so the only thing left to do is change that `someDate` field and return the result as type `MyProcessedData`.
 
@@ -179,9 +178,7 @@ Errors can be thrown at any point in the response processor and they'll bubble u
 try {
   const client = new TypedHttpClient("my-client");
   const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
-  // It's not necessary to tell response or data what types they'll be as it's inferred. But
-  // it's added here for clarity.
-  const response = await client.post<MyProcessedData>({ url }, parseMyRawData);
+  const response = await client.post({ url }, parseMyRawData);
   return response.result;
 } catch (err) {
   // UnauthorizedError would be a custom error you'd define.
@@ -220,7 +217,6 @@ const requestOptions: RequestOptions = {
   responseJsonReviver: JsonISO8601DateAndTimeReviver, // right here
 };
 
-// The return type can be inferred from the response processor too!
 const response = await client.post(requestOptions, parseMyRawData);
 const data: MyProcessedData = response.result;
 ```

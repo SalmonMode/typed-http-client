@@ -5,7 +5,7 @@ import { Body } from "nock/types";
 import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
 import { ResponseBodyNotJSONError } from "../errors";
 import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers";
-import { isNullish, isString } from "../typePredicates";
+import { hasProperty, isString } from "../typePredicates";
 import { TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
 
@@ -24,12 +24,11 @@ export interface ResponseData {
   status: string;
 }
 
-function isRawResponseData(object: unknown): object is RawResponseData {
-  if (isNullish(object)) {
+function isRawResponseData(value: unknown): value is RawResponseData {
+  if (!value) {
     return false;
   }
-  let dict = object as RawResponseData;
-  return isString(dict.status);
+  return hasProperty(value, "status") && isString(value.status);
 }
 
 function parseRawResponseData(
