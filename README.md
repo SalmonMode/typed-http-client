@@ -92,6 +92,9 @@ function parseMyRawData({
   responseBodyAsString,
   responseBodyAsObject,
 }: ResponseProcessorParams): MyProcessedData {
+  // responseBodyAsObject is now recognized as being of type `unknown`
+  assertIsObject(responseBodyAsObject);
+  // responseBodyAsObject is now recognized as being of type `object`
   assertIsMyRawData(responseBodyAsObject);
   // responseBodyAsObject is now recognized as `MyRawData`
   return {
@@ -107,17 +110,17 @@ The first is the full `Response` object. It's exactly what the client is working
 
 The second is the response body as a string, with no processing done to it. It could very well be stringified JSON.
 
-The third is the response body as an object. It'll try to parse JSON responses if the headers indicate it's JSON, but it doesn't know what that'll look like, and if there's no headers telling it there's JSON, it won't try. That's why its type is `unknown`. It could be an object, `null`, `undefined`, a `string`, or a number of other things, so we have to be careful with it.
+The third is the response body as an object. It'll try to parse JSON responses if the headers indicate it's JSON, but it doesn't know what that'll look like, and if there's no headers telling it there's JSON, it won't try. That's why its type is `unknown`. It could be an object, `null`, `undefined`, a `string`, or a number of other things, so we have to be careful with it. It's important that it's recognized as `unknown` first for type safety reasons. We actually have no way of knowing what it is, and it's "illegal" to perform any operations on anything of type `unknown`. Everything should be assumed to be `unknown` unless we can confirm otherwise for maximum type safety.
 
-That's where the [type assertion function](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions), `assertIsMyRawData`, comes in. Type assertion functions can take arguments and confirm for you (by not throwing an error) that something is a particular type. If it throws an error, it definitely isn't that type of data, but it is a real error that'll break the flow of the code so be careful with these. Then again, the errors can be a very powerful tool when combined with `try/catch` blocks.
+That's where the [type assertion functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions) come in. Type assertion functions can take arguments and confirm for you (by not throwing an error) that something is a particular type. If it throws an error, it definitely isn't that type of data, but it is a real error that'll break the flow of the code so be careful with these. Then again, the errors can be a very powerful tool when combined with `try/catch` blocks.
 
-For now, let's look at `assertIsMyRawData` to see how it works:
+First we use the provided `assertIsObject` type assertion function to make sure that what we have is at least of type `object`. We have to be careful, because things get very tricky with `null` and `object`. So this function, and a type predicate version (`isObject`) are provided by `typed-http-client` and care of that for you to make sure it's actually an `object`. Narrowing the type down at least this much lets us at least ask if something has a particular property without it throwing an error.
+
+Then `assertIsMyRawData` comes in to make sure that the data is in the shape compatible with `MyRawData`. Let's look at how it works:
 
 ```typescript
-function assertIsMyRawData(value: unknown): asserts value is MyRawData {
-  if (!isObject(value)) {
-    throw new TypeError("Value is not MyRawData");
-  } else if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
+function assertIsMyRawData(value: object): asserts value is MyRawData {
+  if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
     throw new TypeError("Value is not MyRawData");
   } else if (!hasProperty(value, "someDate") || typeof value.someDate !== "string") {
     throw new TypeError("Value is not MyRawData");
@@ -125,11 +128,7 @@ function assertIsMyRawData(value: unknown): asserts value is MyRawData {
 }
 ```
 
-It's important that it's recognized as `unknown` first. This is because it's "illegal" to perform any operations on anything of type `unknown`. Everything should be assumed to be `unknown` unless we can confirm otherwise for maximum type safety.
-
-Another risk is that `null` and `undefined` are "nullish", which means that if we try to reference a property on them, a `TypeError` will be thrown. There's also an issue with the fact that [the type of `null` is actually `object`](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards). We could use `!value` to narrow the typing quite a lot, but TypeScript gets confused as this, and thinks it would otherwise be of type `{}`, even if `value` was `true`. Luckily the client comes with a type predicate to make this a little more covenient.
-
-Even though we've ruled out errors being thrown when trying to access properties, the compiler will still complain about referencing properties it doesn't know are there. `hasProperty` (provided by `typed-http-client`) tells the compiler that the property exists, but the property type is still `unknown`.
+Even though we've ruled out errors being thrown when trying to access properties, the compiler will still complain about referencing properties it doesn't know are there. `hasProperty` (also provided by `typed-http-client`) tells the compiler that the property exists, but the property type is still `unknown`.
 
 Once the property is confirmed to exist, we can check its type, and repeat the process for the other property. If it makes it through without throwing an error, then it's all good!
 
@@ -196,14 +195,7 @@ For an example of how to define a custom error, check out the `errors.ts` module
 
 To simplify the processing before it reaches your response processor, you may want to try to transform some primitives into more convenient types like `Date` objects, since those can't be sent over the wire in JSON. The `JSON.parse` function accepts an argument it calls a ["reviver"](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#the_reviver_parameter) that does exactly this. You can think of it like a preprocessor for the response if it's JSON.
 
-The client allows you to pass your own reviver function along with your request options if desired. And a couple `Date`-focused revivers are provided with the client that transform [ISO 8601](https://www.w3.org/TR/NOTE-datetime) formatted strings if encountered. You can define your own using them as an example. If you wish to use them, you can import them like this:
-
-```typescript
-import {
-  JsonISO8601DateReviver,
-  JsonISO8601DateAndTimeReviver,
-} from 'typed-http-client/JsonRevivers';
-```
+The client allows you to pass your own reviver function along with your request options if desired. And a couple `Date`-focused revivers are provided with the client that transform [ISO 8601](https://www.w3.org/TR/NOTE-datetime) formatted strings if encountered. You can define your own using them as an example.
 
 Note that the typing information is still unknown by the compiler, so the response processing function will still be very much in the dark until it actually checks, but this can save a bit of effort by making it easy to check things.
 
@@ -233,30 +225,22 @@ export interface MyData {
 Here's how our type assertion function changes:
 
 ```typescript
-function assertIsMyData(value: unknown): asserts value is MyData {
-  // We only want objects.
-  if (!isObject(value)) {
-    throw new TypeError("Value is not MyRawData");
-  }
-  // Assign it to type any now that it is confirmed to not be nullish so the compiler doesn't
-  // complain about members not existing.
-  const obj: any = value;
-  if (!Number.isFinite(obj.member)) {
-    throw new TypeError("Value is not MyRawData");
-  } else if (!obj.someDate instanceof Date) { // right here
-    throw new TypeError("Value is not MyRawData");
+function assertIsMyData(value: object): asserts value is MyData {
+  if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
+    throw new TypeError("Value is not MyData");
+  } else if (!hasProperty(value, "someDate") || !value.someDate instanceof Date) { // right here
+    throw new TypeError("Value is not MyData");
   }
 }
 ```
 
-And our response processor now looks like this:
+And our response processor now looks like this (we can also strip out the parameters we don't need):
 
 ```typescript
-function parseMyRawData(
-  response: Response,
-  responseBodyAsString: string,
-  responseBodyAsObject: unknown
-): MyData {
+function parseMyRawData({
+  responseBodyAsObject,
+}: ResponseProcessorParams): MyData {
+  assertIsObject(responseBodyAsObject);
   assertIsMyData(responseBodyAsObject);
   // responseBodyAsObject is now recognized as `MyData`
   return responseBodyAsObject;
