@@ -115,7 +115,7 @@ For now, let's look at `assertIsMyRawData` to see how it works:
 
 ```typescript
 function assertIsMyRawData(value: unknown): asserts value is MyRawData {
-  if (!value) {
+  if (typeof value !== "object" || value === null) {
     throw new TypeError("Value is not MyRawData");
   } else if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
     throw new TypeError("Value is not MyRawData");
@@ -127,7 +127,7 @@ function assertIsMyRawData(value: unknown): asserts value is MyRawData {
 
 It's important that it's recognized as `unknown` first. This is because it's "illegal" to perform any operations on anything of type `unknown`. Everything should be assumed to be `unknown` unless we can confirm otherwise for maximum type safety.
 
-Another risk is that `null` and `undefined` are "nullish", which means that if we try to reference a property on them, a `TypeError` will be thrown. We could've used `value === null || value === undefined`, but `!value` is shorter and covers more things we don't need to worry about (we aren't looking for anything "falsy").
+Another risk is that `null` and `undefined` are "nullish", which means that if we try to reference a property on them, a `TypeError` will be thrown. There's also an issue with the fact that [the type of `null` is actually `object`](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#typeof-type-guards). We could use `!value` to narrow the typing quite a lot, but TypeScript gets confused as this, and thinks it would otherwise be of type `{}`, even if `value` was `true`. But we're only looking for `object` and not `null`, so the check in the example suffices.
 
 Even though we've ruled out errors being thrown when trying to access properties, the compiler will still complain about referencing properties it doesn't know are there. `hasProperty` (provided by `typed-http-client`) tells the compiler that the property exists, but the property type is still `unknown`.
 
@@ -234,8 +234,8 @@ Here's how our type assertion function changes:
 
 ```typescript
 function assertIsMyData(value: unknown): asserts value is MyData {
-  // Check if nullish first so members can be accessed later without throwing errors.
-  if (value === null || value === undefined) {
+  // We only want objects.
+  if (typeof value !== "object" || value === null) {
     throw new TypeError("Value is not MyRawData");
   }
   // Assign it to type any now that it is confirmed to not be nullish so the compiler doesn't
