@@ -1,6 +1,6 @@
 {
   "name": "typed-http-client",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
