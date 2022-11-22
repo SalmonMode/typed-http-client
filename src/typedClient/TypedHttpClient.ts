@@ -374,13 +374,19 @@ export default class TypedHttpClient {
   }
 
   /**
-   * Check if the content type of the request or response is "application/json"
+   * Check if the content type of the request or response is "application/json".
+   * 
+   * The Content-Type header may contain extra information beyond the media type, like `charset=utf-8`, so it must be
+   * checked to see if the media type for JSON content ('application/json') is included, as oppposed to just checking if
+   * it's equal to the media type. 
    *
    * @param headers the request or response headers
-   * @returns true if the content type is "application/json", false if not
+   * @returns true, if the content type is "application/json", false, if not
    */
   private _contentTypeIsJson(headers: Headers): boolean {
-    return headers.get("content-type") === JSONContentTypeHandler.mediaType;
+    const contentType = headers.get("content-type");
+    const jsonContentType = JSONContentTypeHandler.mediaType;
+    return !!contentType && contentType.includes(jsonContentType);
   }
 
   /**

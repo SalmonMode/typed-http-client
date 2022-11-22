@@ -229,6 +229,57 @@ describe("TypedHttpClient", function () {
         expect(params.get("other")).to.equal("world");
       });
     });
+    describe("With query string and response with charset in Content-Type header", function () {
+      let requestUri: string;
+      let payload = {
+        something: "hello",
+        other: "world",
+      };
+      before(async function () {
+        client = new TypedHttpClient("typed-http-client-tests");
+        nock("https://localhost:80")
+          .get(new RegExp("/.*"))
+          .reply(
+            200,
+            function (uri: string, reqBody: Body): ResponseData {
+              requestHeaders = new Headers(this.req.headers);
+              requestMethod = this.req.method;
+              requestBody = reqBody;
+              requestUri = uri;
+              return { status: "ok" };
+            },
+            {
+              "content-type": "application/json; charset=utf-8",
+            }
+          );
+        restRes = await client.get<ResponseData>(
+          { url: urlWithQueryString },
+          parseRawResponseData
+        );
+      });
+
+      after(function () {
+        nock.cleanAll();
+      });
+
+      it("received response", function () {
+        expect(restRes.result).to.deep.equal({ status: "ok" });
+      });
+      it("uses null header because it has no body", async function () {
+        expect(requestHeaders.get("content-type")).to.equal(null);
+      });
+      it("request body is empty", async function () {
+        expect(requestBody).to.deep.equal("");
+      });
+      it("uses GET", async function () {
+        expect(requestMethod).to.equal("GET");
+      });
+      it("uses query string", async function () {
+        let params = new URL(`https://localhost:80${requestUri}`).searchParams;
+        expect(params.get("something")).to.equal("hello");
+        expect(params.get("other")).to.equal("world");
+      });
+    });
     describe("With Reviver", function () {
       const expectedDate = new Date();
       before(async function () {
