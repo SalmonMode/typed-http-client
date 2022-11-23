@@ -1,7 +1,7 @@
 {
   "name": "typed-http-client",
-  "version": "0.7.1",
-  "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses.",
+  "version": "0.7.2",
+  "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses for Node, Browsers and React Native.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -32,6 +32,25 @@
   },
   "author": "Chris NeJame",
   "license": "MIT",
+  "keywords": [
+    "TypeScript",
+    "JavaScript",
+    "rest",
+    "http",
+    "fetch",
+    "url",
+    "promise",
+    "async",
+    "await",
+    "universal",
+    "node",
+    "react",
+    "native",
+    "browser",
+    "xhr",
+    "ajax",
+    "client"
+  ],
   "dependencies": {
     "cross-fetch": "^3.1.5"
   },

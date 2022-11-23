@@ -4,7 +4,7 @@
 A TypeScript HTTP client that facilitates strongly typed requests and responses.
 
 # Introduction
-This is a simple, strongly typed HTTP client that's meant to work in both a browser and a Node.js runtime environment. It provides two main features:
+This is a simple, strongly typed HTTP client that works in Node.js, a browser, and the React Native runtime environment (thanks to [cross-fetch](https://github.com/lquixada/cross-fetch)). It provides two main features:
 
 1. Strongly typed requests
 2. Strongly typed responses
