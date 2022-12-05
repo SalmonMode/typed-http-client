@@ -51,7 +51,7 @@ export default class TypedHttpClient {
    * @constructor
    * @param {string} userAgent - userAgent for requests
    */
-  constructor(userAgent: string) {
+  constructor(userAgent?: string) {
     this.client = new HttpClient(userAgent);
   }
 
@@ -364,8 +364,8 @@ export default class TypedHttpClient {
     let result: ReturnType = responseProcessor({
       response,
       responseBodyAsString: bodyContentsAsString,
-      responseBodyAsObject: bodyContentsAsObject,}
-    );
+      responseBodyAsObject: bodyContentsAsObject,
+    });
     return {
       statusCode: response.status,
       result: result,
@@ -375,10 +375,10 @@ export default class TypedHttpClient {
 
   /**
    * Check if the content type of the request or response is "application/json".
-   * 
+   *
    * The Content-Type header may contain extra information beyond the media type, like `charset=utf-8`, so it must be
    * checked to see if the media type for JSON content ('application/json') is included, as oppposed to just checking if
-   * it's equal to the media type. 
+   * it's equal to the media type.
    *
    * @param headers the request or response headers
    * @returns true, if the content type is "application/json", false, if not
