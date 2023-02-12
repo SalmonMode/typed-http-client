@@ -1,9 +1,11 @@
 [![codecov](https://codecov.io/gh/SalmonMode/typed-http-client/branch/main/graph/badge.svg?token=E28MMT0TC6)](https://codecov.io/gh/SalmonMode/typed-http-client)
 
 # typed-http-client
+
 A TypeScript HTTP client that facilitates strongly typed requests and responses.
 
 # Introduction
+
 This is a simple, strongly typed HTTP client that works in Node.js, a browser, and the React Native runtime environment (thanks to [cross-fetch](https://github.com/lquixada/cross-fetch)). It provides two main features:
 
 1. Strongly typed requests
@@ -36,7 +38,7 @@ npm install --save typed-http-client
 Let's start with the meat of it. What's it like to use the results? Importing looks like this:
 
 ```typescript
-import { TypedHttpClient } from 'typed-http-client';
+import { TypedHttpClient } from "typed-http-client";
 ```
 
 Now let's take a peak at how it'll look in your code if you need to send a `POST` request to a particular endpoint that sends back some simple JSON data:
@@ -46,7 +48,8 @@ const client = new TypedHttpClient("my-client");
 const url = new URL("https://www.somecoolwebsite.com/post-endpoint");
 // It's not necessary to tell response or data what types they'll be as it's inferred. But
 // it's added here for clarity.
-const response: ITypedResponse<MyProcessedData> = await client.post<MyProcessedData>({ url }, parseMyRawData);
+const response: ITypedResponse<MyProcessedData> =
+  await client.post<MyProcessedData>({ url }, parseMyRawData);
 const data: MyProcessedData = response.result;
 ```
 
@@ -114,7 +117,7 @@ The third is the response body as an object. It'll try to parse JSON responses i
 
 That's where the [type assertion functions](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#assertion-functions) come in. Type assertion functions can take arguments and confirm for you (by not throwing an error) that something is a particular type. If it throws an error, it definitely isn't that type of data, but it is a real error that'll break the flow of the code so be careful with these. Then again, the errors can be a very powerful tool when combined with `try/catch` blocks.
 
-First we use the provided `assertIsObject` type assertion function to make sure that what we have is at least of type `object`. We have to be careful, because things get very tricky with `null` and `object`. So this function, and a type predicate version (`isObject`) are provided by `typed-http-client` and care of that for you to make sure it's actually an `object`. Narrowing the type down at least this much lets us at least ask if something has a particular property without it throwing an error.
+First we use a type assertion function to ensure the argument is an actual `object`. For this example, we're using `assertIsObject`, provided by [primitive-predicates](https://www.npmjs.com/package/primitive-predicates). This library is used because things get tricky with `object` and `null` (since `typeof responseBodyAsObject === "object"` would also be true for `null`). That library provides a number of other useful type guard functions, like `hasProperty` that we'll see in this next example.
 
 Then `assertIsMyRawData` comes in to make sure that the data is in the shape compatible with `MyRawData`. Let's look at how it works:
 
@@ -122,13 +125,16 @@ Then `assertIsMyRawData` comes in to make sure that the data is in the shape com
 function assertIsMyRawData(value: object): asserts value is MyRawData {
   if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
     throw new TypeError("Value is not MyRawData");
-  } else if (!hasProperty(value, "someDate") || typeof value.someDate !== "string") {
+  } else if (
+    !hasProperty(value, "someDate") ||
+    typeof value.someDate !== "string"
+  ) {
     throw new TypeError("Value is not MyRawData");
   }
 }
 ```
 
-Even though we've ruled out errors being thrown when trying to access properties, the compiler will still complain about referencing properties it doesn't know are there. `hasProperty` (also provided by `typed-http-client`) tells the compiler that the property exists, but the property type is still `unknown`.
+Even though we've ruled out errors being thrown when trying to access properties, the compiler will still complain about referencing properties it doesn't know are there. `hasProperty` tells the compiler that the property exists, but the property type is still `unknown`.
 
 Once the property is confirmed to exist, we can check its type, and repeat the process for the other property. If it makes it through without throwing an error, then it's all good!
 
@@ -228,7 +234,11 @@ Here's how our type assertion function changes:
 function assertIsMyData(value: object): asserts value is MyData {
   if (!hasProperty(value, "someNumber") || !Number.isFinite(value.someNumber)) {
     throw new TypeError("Value is not MyData");
-  } else if (!hasProperty(value, "someDate") || !value.someDate instanceof Date) { // right here
+  } else if (
+    !hasProperty(value, "someDate") ||
+    !value.someDate instanceof Date
+  ) {
+    // right here
     throw new TypeError("Value is not MyData");
   }
 }

@@ -5,7 +5,7 @@ import { Body } from "nock/types";
 import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
 import { ResponseBodyNotJSONError } from "../errors";
 import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers";
-import { hasProperty, isString } from "../typePredicates";
+import { hasProperty, isObject, isString } from "primitive-predicates";
 import { ResponseProcessorParams, TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
 
@@ -25,18 +25,24 @@ export interface ResponseData {
 }
 
 function isRawResponseData(value: unknown): value is RawResponseData {
-  if (!value) {
-    return false;
-  }
-  return hasProperty(value, "status") && isString(value.status);
+  return (
+    !!value &&
+    isObject(value) &&
+    hasProperty(value, "status") &&
+    isString(value.status)
+  );
 }
 
-function parseRawResponseData({responseBodyAsObject}: ResponseProcessorParams): ResponseData {
+function parseRawResponseData({
+  responseBodyAsObject,
+}: ResponseProcessorParams): ResponseData {
   if (isRawResponseData(responseBodyAsObject)) {
     return { ...responseBodyAsObject };
   }
   throw new TypeError(
-    `Response body is not RawResponseData: ${JSON.stringify(responseBodyAsObject)}`
+    `Response body is not RawResponseData: ${JSON.stringify(
+      responseBodyAsObject
+    )}`
   );
 }
 

@@ -2,10 +2,11 @@ import { HttpMethod } from "./HttpMethod";
 
 export interface RequestInitSansMethod extends Omit<RequestInit, "method"> {}
 export interface RequestInitSansBody extends Omit<RequestInit, "body"> {}
-export interface RequestInitSansMethodAndBody extends Omit<RequestInit, "body" | "method"> {}
+export interface RequestInitSansMethodAndBody
+  extends Omit<RequestInit, "body" | "method"> {}
 /**
  * The details for a HEAD request.
- * 
+ *
  * HEAD requests cannot have a body.
  */
 export interface HeadRequestInit extends RequestInitSansBody {
@@ -16,7 +17,7 @@ export interface OptionsRequestInit extends RequestInit {
 }
 /**
  * The details for a GET request.
- * 
+ *
  * GET requests cannot have a body.
  */
 export interface GetRequestInit extends RequestInitSansBody {
