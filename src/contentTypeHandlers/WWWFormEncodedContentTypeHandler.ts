@@ -31,16 +31,3 @@ const WWWFormEncodedContentTypeHandler: ContentTypeHandler<
   },
 };
 export default WWWFormEncodedContentTypeHandler;
-
-
-function a(x: unknown) {
-  if (x !== null && typeof x === "object"){
-    console.log(x)
-  }
-}
-
-const someVar: any = {};
-if (someVar !== null && typeof someVar === "object") {
-  // 'someVar' is still recognized as type 'any'
-  someVar.thing(); // Compiler doesn't complain
-}
