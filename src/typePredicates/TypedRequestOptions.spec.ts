@@ -6,7 +6,7 @@ import {
   isTypedRequestOptionsWithPayloadWithAdditionalAndAccept,
 } from "./TypedRequestOptions";
 
-var expect = chai.expect;
+const expect = chai.expect;
 
 interface PType {
   a: string;

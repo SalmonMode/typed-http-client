@@ -1,15 +1,12 @@
-import { Headers } from "cross-fetch";
-import * as chai from "chai";
+import { expect, use } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
-import HttpClient from "./HttpClient";
 import * as nock from "nock";
+import HttpClient from "./HttpClient";
 
-chai.use(chaiAsPromised);
-
-var expect = chai.expect;
+use(chaiAsPromised);
 
 interface ResponseData {
-  headers: any;
+  headers: Record<string, string>;
   method: string;
   url: string;
 }
@@ -36,8 +33,9 @@ describe("HttpClient", function () {
             .get("/get")
             .reply(
               200,
-              function (uri: string, reqBody: nock.Body): ResponseData {
-                let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+              function (uri: string, _reqBody: nock.Body): ResponseData {
+                const context: nock.ReplyFnContext =
+                  this as nock.ReplyFnContext;
                 return {
                   method: context.req.method,
                   headers: context.req.headers,
@@ -47,23 +45,22 @@ describe("HttpClient", function () {
             );
         });
         it("succeeds", async function () {
-          let res: Response = await httpClient.get(
+          const res: Response = await httpClient.get(
             new URL("http://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
-          let obj: any = JSON.parse(body);
+          const body: string = await res.text();
+          const obj = JSON.parse(body);
           expect(Object.keys(obj.headers)).to.include("user-agent");
         });
         it("succeeds with undefined agent", async function () {
-          let http: HttpClient = new HttpClient(undefined);
-          let res: Response = await http.get(
+          const http: HttpClient = new HttpClient(undefined);
+          const res: Response = await http.get(
             new URL("http://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
-          let obj: any = JSON.parse(body);
-          let x = new Headers();
+          const body: string = await res.text();
+          const obj = JSON.parse(body);
           expect(Object.keys(obj.headers)).to.include("user-agent");
           expect(obj.headers["user-agent"]).to.deep.equal([
             "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
@@ -71,13 +68,13 @@ describe("HttpClient", function () {
         });
 
         it("succeeds with empty agent", async function () {
-          let http: HttpClient = new HttpClient("");
-          let res: Response = await http.get(
+          const http: HttpClient = new HttpClient("");
+          const res: Response = await http.get(
             new URL("http://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
-          let obj: any = JSON.parse(body);
+          const body: string = await res.text();
+          const obj = JSON.parse(body);
           expect(Object.keys(obj.headers)).to.include("user-agent");
           expect(obj.headers["user-agent"]).to.deep.equal([
             "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
@@ -88,8 +85,8 @@ describe("HttpClient", function () {
         beforeEach(function () {
           nockScope.get("/get").reply(
             200,
-            function (uri: string, reqBody: nock.Body): ResponseData {
-              let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+            function (uri: string, _reqBody: nock.Body): ResponseData {
+              const context: nock.ReplyFnContext = this as nock.ReplyFnContext;
               return {
                 method: context.req.method,
                 headers: context.req.headers,
@@ -100,19 +97,19 @@ describe("HttpClient", function () {
           );
         });
         it("succeeds", async function () {
-          let res: Response = await httpClient.get(
+          const res: Response = await httpClient.get(
             new URL("http://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
+          await expect(res.text()).to.eventually.be.fulfilled;
         });
       });
       describe("Compatible charset in response", function () {
         beforeEach(function () {
           nockScope.get("/get").reply(
             200,
-            function (uri: string, reqBody: nock.Body): ResponseData {
-              let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+            function (uri: string, _reqBody: nock.Body): ResponseData {
+              const context: nock.ReplyFnContext = this as nock.ReplyFnContext;
               return {
                 method: context.req.method,
                 headers: context.req.headers,
@@ -123,19 +120,19 @@ describe("HttpClient", function () {
           );
         });
         it("succeeds", async function () {
-          let res: Response = await httpClient.get(
+          const res: Response = await httpClient.get(
             new URL("http://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
+          await expect(res.text()).to.eventually.be.fulfilled;
         });
       });
       describe("Incompatible charset in response", function () {
         beforeEach(function () {
           nockScope.get("/get").reply(
             200,
-            function (uri: string, reqBody: nock.Body): ResponseData {
-              let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+            function (uri: string, _reqBody: nock.Body): ResponseData {
+              const context: nock.ReplyFnContext = this as nock.ReplyFnContext;
               return {
                 method: context.req.method,
                 headers: context.req.headers,
@@ -146,11 +143,11 @@ describe("HttpClient", function () {
           );
         });
         it("succeeds", async function () {
-          let res: Response = await httpClient.get(
+          const res: Response = await httpClient.get(
             new URL("http://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
+          await expect(res.text()).to.eventually.be.fulfilled;
         });
       });
       describe("404", function () {
@@ -159,8 +156,9 @@ describe("HttpClient", function () {
             .get("/status/404")
             .reply(
               404,
-              function (uri: string, reqBody: nock.Body): ResponseData {
-                let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+              function (uri: string, _reqBody: nock.Body): ResponseData {
+                const context: nock.ReplyFnContext =
+                  this as nock.ReplyFnContext;
                 return {
                   method: context.req.method,
                   headers: context.req.headers,
@@ -170,11 +168,11 @@ describe("HttpClient", function () {
             );
         });
         it("succeeds", async function () {
-          let res: Response = await httpClient.get(
+          const res: Response = await httpClient.get(
             new URL("http://localhost:80/status/404")
           );
           expect(res.status).to.equal(404);
-          let body: string = await res.text();
+          await expect(res.text()).to.eventually.be.fulfilled;
         });
       });
     });
@@ -182,17 +180,20 @@ describe("HttpClient", function () {
       beforeEach(function () {
         nockScope
           .head("/head")
-          .reply(200, function (uri: string, reqBody: nock.Body): ResponseData {
-            let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
-            return {
-              method: context.req.method,
-              headers: context.req.headers,
-              url: uri,
-            };
-          });
+          .reply(
+            200,
+            function (uri: string, _reqBody: nock.Body): ResponseData {
+              const context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+              return {
+                method: context.req.method,
+                headers: context.req.headers,
+                url: uri,
+              };
+            }
+          );
       });
       it("succeeds", async function () {
-        let res: Response = await httpClient.head(
+        const res: Response = await httpClient.head(
           new URL("http://localhost:80/head")
         );
         expect(res.status).to.equal(200);
@@ -202,30 +203,30 @@ describe("HttpClient", function () {
       beforeEach(function () {
         nockScope
           .post("/post")
-          .reply(200, function (uri: string, reqBody: nock.Body): nock.Body {
+          .reply(200, function (_uri: string, reqBody: nock.Body): nock.Body {
             return {
               data: reqBody,
             };
           });
       });
       it("succeeds", async function () {
-        let data: string = "Hello World!";
-        let res: Response = await httpClient.post(
+        const data = "Hello World!";
+        const res: Response = await httpClient.post(
           new URL("http://localhost:80/post"),
           { body: data }
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        const obj = JSON.parse(body);
         expect(obj.data).to.equal(data);
       });
       it("succeeds without body", async function () {
-        let res: Response = await httpClient.post(
+        const res: Response = await httpClient.post(
           new URL("http://localhost:80/post")
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        const obj = JSON.parse(body);
         expect(obj.data).to.equal("");
       });
     });
@@ -233,30 +234,30 @@ describe("HttpClient", function () {
       beforeEach(function () {
         nockScope
           .patch("/patch")
-          .reply(200, function (uri: string, reqBody: nock.Body): nock.Body {
+          .reply(200, function (_uri: string, reqBody: nock.Body): nock.Body {
             return {
               data: reqBody,
             };
           });
       });
       it("succeeds", async function () {
-        let data: string = "Hello World!";
-        let res: Response = await httpClient.patch(
+        const data = "Hello World!";
+        const res: Response = await httpClient.patch(
           new URL("http://localhost:80/patch"),
           { body: data }
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        const obj = JSON.parse(body);
         expect(obj.data).to.equal(data);
       });
       it("succeeds without body", async function () {
-        let res: Response = await httpClient.patch(
+        const res: Response = await httpClient.patch(
           new URL("http://localhost:80/patch")
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        const obj = JSON.parse(body);
         expect(obj.data).to.equal("");
       });
     });
@@ -271,23 +272,23 @@ describe("HttpClient", function () {
           });
       });
       it("succeeds", async function () {
-        let data: string = "Hello World!";
-        let res: Response = await httpClient.put(
+        const data = "Hello World!";
+        const res: Response = await httpClient.put(
           new URL("http://localhost:80/put"),
           { body: data }
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        const obj = JSON.parse(body);
         expect(obj.data).to.equal(data);
       });
       it("succeeds without body", async function () {
-        let res: Response = await httpClient.put(
+        const res: Response = await httpClient.put(
           new URL("http://localhost:80/put")
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        const obj = JSON.parse(body);
         expect(obj.data).to.equal("");
       });
     });
@@ -295,43 +296,49 @@ describe("HttpClient", function () {
       beforeEach(function () {
         nockScope
           .delete("/delete")
-          .reply(200, function (uri: string, reqBody: nock.Body): ResponseData {
-            let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
-            return {
-              method: context.req.method,
-              headers: context.req.headers,
-              url: uri,
-            };
-          });
+          .reply(
+            200,
+            function (uri: string, _reqBody: nock.Body): ResponseData {
+              const context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+              return {
+                method: context.req.method,
+                headers: context.req.headers,
+                url: uri,
+              };
+            }
+          );
       });
       it("succeeds", async function () {
-        let res: Response = await httpClient.delete(
+        const res: Response = await httpClient.delete(
           new URL("http://localhost:80/delete")
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
-        let obj: any = JSON.parse(body);
+        const body: string = await res.text();
+        expect(typeof JSON.parse(body)).to.equal("object");
       });
     });
     describe("OPTIONS", function () {
       beforeEach(function () {
         nockScope
           .options("/options")
-          .reply(200, function (uri: string, reqBody: nock.Body): ResponseData {
-            let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
-            return {
-              method: context.req.method,
-              headers: context.req.headers,
-              url: uri,
-            };
-          });
+          .reply(
+            200,
+            function (uri: string, _reqBody: nock.Body): ResponseData {
+              const context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+              return {
+                method: context.req.method,
+                headers: context.req.headers,
+                url: uri,
+              };
+            }
+          );
       });
       it("succeeds", async function () {
-        let res: Response = await httpClient.options(
+        const res: Response = await httpClient.options(
           new URL("http://localhost:80/options")
         );
         expect(res.status).to.equal(200);
-        let body: string = await res.text();
+        await expect(res.text()).to.eventually.be.fulfilled;
       });
     });
   });
@@ -348,8 +355,9 @@ describe("HttpClient", function () {
             .get("/get")
             .reply(
               200,
-              function (uri: string, reqBody: nock.Body): ResponseData {
-                let context: nock.ReplyFnContext = this as nock.ReplyFnContext;
+              function (uri: string, _reqBody: nock.Body): ResponseData {
+                const context: nock.ReplyFnContext =
+                  this as nock.ReplyFnContext;
                 return {
                   method: context.req.method,
                   headers: context.req.headers,
@@ -359,12 +367,12 @@ describe("HttpClient", function () {
             );
         });
         it("succeeds", async function () {
-          let res: Response = await httpClient.get(
+          const res: Response = await httpClient.get(
             new URL("https://localhost:80/get")
           );
           expect(res.status).to.equal(200);
-          let body: string = await res.text();
-          let obj: any = JSON.parse(body);
+          const body: string = await res.text();
+          const obj = JSON.parse(body);
           expect(Object.keys(obj.headers)).to.include("user-agent");
         });
       });

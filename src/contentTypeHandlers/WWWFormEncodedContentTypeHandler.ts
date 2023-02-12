@@ -11,20 +11,22 @@ import {
  * Converts the payload (which should be a simple key value pair object) to URL encoding.
  */
 const WWWFormEncodedContentTypeHandler: ContentTypeHandler<
-  Record<string, any>
+  Record<string, unknown>
 > = {
   mediaType: `${MediaTypeCategory.Application}/x-www-form-urlencoded`,
   charset: NodeSupportedEncoding.UTF8,
   get header(): ContentTypeHeaderString {
     return `${this.mediaType}; charset=${this.charset}`;
   },
-  getContentForRequestFromPayload<T extends Record<string, any>>(
+  getContentForRequestFromPayload<T extends Record<string, unknown>>(
     payload: T
   ): string {
-    let formBodyArray = [];
-    for (let property in payload) {
-      let encodedKey = encodeURIComponent(property);
-      let encodedValue = encodeURIComponent(payload[property]);
+    const formBodyArray = [];
+    for (const property in payload) {
+      const encodedKey = encodeURIComponent(property);
+      const rawValue = payload[property];
+      const encodableValue = String(rawValue);
+      const encodedValue = encodeURIComponent(encodableValue);
       formBodyArray.push(encodedKey + "=" + encodedValue);
     }
     return formBodyArray.join("&");

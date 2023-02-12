@@ -1,15 +1,15 @@
 import * as chai from "chai";
 import JSONContentTypeHandler from "./JSONContentTypeHandler";
 
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe("JSONContentTypeHandler", function () {
   it("provides stringified JSON from data", function () {
-    let expected = {
+    const expected = {
       fruit: "apple",
       number: 3,
     };
-    let content =
+    const content =
       JSONContentTypeHandler.getContentForRequestFromPayload(expected);
     expect(JSON.parse(content)).to.deep.equal(expected);
   });

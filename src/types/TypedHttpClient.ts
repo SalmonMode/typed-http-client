@@ -37,7 +37,7 @@ export type ResponseProcessor<ReturnType> = (
  *
  * @see {@link JSON.parse} for more information.
  */
-export type JsonReviver = (key: string, value: any) => any;
+export type JsonReviver = (key: string, value: unknown) => unknown;
 
 export interface RequestOptions {
   url: URL;
@@ -61,11 +61,11 @@ export interface TypedRequestOptions<PayloadType = undefined>
   extends TypedRequestOptionsBase<PayloadType> {
   payload?: PayloadType;
 }
-export interface TypedRequestOptionsWithPayload<PayloadType extends any>
+export interface TypedRequestOptionsWithPayload<PayloadType>
   extends TypedRequestOptions<PayloadType> {
   payload: PayloadType;
 }
-export interface TypedRequestOptionsWithHandler<PayloadType extends any>
+export interface TypedRequestOptionsWithHandler<PayloadType>
   extends TypedRequestOptionsBase<PayloadType> {
   payload: PayloadType;
   contentTypeHandler: ContentTypeHandler<PayloadType>;
@@ -78,7 +78,7 @@ export interface TypedRequestOptionsWithAdditionalAndAccept<
   acceptHeader: string;
 }
 export interface RequestOptionsWithPayload extends RequestOptions {
-  payload: any;
+  payload: unknown;
   contentTypeHandler?: ContentTypeHandler<unknown>;
 }
 export interface RequestOptionsWithAdditionalAndAccept extends RequestOptions {

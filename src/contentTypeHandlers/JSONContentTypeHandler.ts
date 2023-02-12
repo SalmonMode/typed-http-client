@@ -10,7 +10,7 @@ import {
  *
  * Converts whatever payload is provided into a string via JSON.stringify.
  */
-const JSONContentTypeHandler: ContentTypeHandler<any> = {
+const JSONContentTypeHandler: ContentTypeHandler<unknown> = {
   mediaType: `${MediaTypeCategory.Application}/json`,
   charset: NodeSupportedEncoding.UTF8,
   get header(): ContentTypeHeaderString {

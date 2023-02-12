@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import { JsonISO8601DateAndTimeReviver, JsonISO8601DateReviver } from "./Date";
 
-var expect = chai.expect;
+const expect = chai.expect;
 
 describe("JSON Reviver Functions", function () {
   describe("ISO 8601", function () {

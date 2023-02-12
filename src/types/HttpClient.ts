@@ -1,9 +1,8 @@
 import { HttpMethod } from "./HttpMethod";
 
-export interface RequestInitSansMethod extends Omit<RequestInit, "method"> {}
-export interface RequestInitSansBody extends Omit<RequestInit, "body"> {}
-export interface RequestInitSansMethodAndBody
-  extends Omit<RequestInit, "body" | "method"> {}
+export type RequestInitSansMethod = Omit<RequestInit, "method">
+export type RequestInitSansBody = Omit<RequestInit, "body">
+export type RequestInitSansMethodAndBody = Omit<RequestInit, "body" | "method">
 /**
  * The details for a HEAD request.
  *

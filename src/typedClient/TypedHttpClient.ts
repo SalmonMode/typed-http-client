@@ -66,8 +66,8 @@ export default class TypedHttpClient {
   public async head(
     requestOptions: RequestOptions
   ): Promise<TypedResponse<undefined>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response: Response = await this.client.head(
+    const requestInit = this._getRequestResources(requestOptions);
+    const response: Response = await this.client.head(
       requestOptions.url,
       requestInit
     );
@@ -96,8 +96,8 @@ export default class TypedHttpClient {
     requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response = await this.client.options(requestOptions.url, requestInit);
+    const requestInit = this._getRequestResources(requestOptions);
+    const response = await this.client.options(requestOptions.url, requestInit);
     return this.processResponse(
       response,
       responseProcessor,
@@ -117,8 +117,8 @@ export default class TypedHttpClient {
     requestOptions: RequestOptions,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response = await this.client.get(requestOptions.url, requestInit);
+    const requestInit = this._getRequestResources(requestOptions);
+    const response = await this.client.get(requestOptions.url, requestInit);
     return this.processResponse(
       response,
       responseProcessor,
@@ -144,8 +144,8 @@ export default class TypedHttpClient {
     requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response = await this.client.post(requestOptions.url, requestInit);
+    const requestInit = this._getRequestResources(requestOptions);
+    const response = await this.client.post(requestOptions.url, requestInit);
     return this.processResponse(
       response,
       responseProcessor,
@@ -171,8 +171,8 @@ export default class TypedHttpClient {
     requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response = await this.client.put(requestOptions.url, requestInit);
+    const requestInit = this._getRequestResources(requestOptions);
+    const response = await this.client.put(requestOptions.url, requestInit);
     return this.processResponse<ReturnType>(
       response,
       responseProcessor,
@@ -198,8 +198,8 @@ export default class TypedHttpClient {
     requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response = await this.client.patch(requestOptions.url, requestInit);
+    const requestInit = this._getRequestResources(requestOptions);
+    const response = await this.client.patch(requestOptions.url, requestInit);
     return this.processResponse(
       response,
       responseProcessor,
@@ -225,8 +225,8 @@ export default class TypedHttpClient {
     requestOptions: RequestOptions | TypedRequestOptions<PayloadType>,
     responseProcessor: ResponseProcessor<ReturnType>
   ): Promise<TypedResponse<ReturnType>> {
-    let requestInit = this._getRequestResources(requestOptions);
-    let response = await this.client.delete(requestOptions.url, requestInit);
+    const requestInit = this._getRequestResources(requestOptions);
+    const response = await this.client.delete(requestOptions.url, requestInit);
     return this.processResponse(
       response,
       responseProcessor,
@@ -287,13 +287,13 @@ export default class TypedHttpClient {
       | RequestOptionsWithAdditionalAndAccept
       | TypedRequestOptionsWithAdditionalAndAccept<PayloadType>
   ): Headers {
-    let headers: Headers = new Headers(requestOptions.additionalHeaders);
+    const headers: Headers = new Headers(requestOptions.additionalHeaders);
     headers.set("accept", requestOptions.acceptHeader);
     if (
       isTypedRequestOptionsWithPayloadWithAdditionalAndAccept(requestOptions)
     ) {
       // A payload was provided so provide the content-type header must be set.
-      let contentHandler = requestOptions.contentTypeHandler;
+      const contentHandler = requestOptions.contentTypeHandler;
       headers.set("content-type", contentHandler.header);
     }
     // No payload was provided so no need for a content-type header.
@@ -351,7 +351,7 @@ export default class TypedHttpClient {
     responseJsonReviver?: JsonReviver
   ): Promise<TypedResponse<ReturnType>> {
     // Get the body as a string first.
-    let bodyContentsAsString = await response.text();
+    const bodyContentsAsString = await response.text();
     // If the content-type indicates JSON, attempts to parse the contents as such.
     let bodyContentsAsObject: unknown;
     if (this._contentTypeIsJson(response.headers)) {
@@ -361,7 +361,7 @@ export default class TypedHttpClient {
       );
     }
     // Process the response
-    let result: ReturnType = responseProcessor({
+    const result: ReturnType = responseProcessor({
       response,
       responseBodyAsString: bodyContentsAsString,
       responseBodyAsObject: bodyContentsAsObject,

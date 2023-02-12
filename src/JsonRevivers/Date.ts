@@ -9,7 +9,7 @@
  * @see {@link https://www.w3.org/TR/NOTE-datetime}
  * @type {RegExp}
  */
-var ISO_8601 =
+const ISO_8601 =
   /^\d{4}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?)?)?$/i;
 
 /**
@@ -21,7 +21,7 @@ var ISO_8601 =
  * @see {@link https://www.w3.org/TR/NOTE-datetime}
  * @type {RegExp}
  */
-var ISO_8601_FULL =
+const ISO_8601_FULL =
   /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
 
 /**
@@ -45,7 +45,10 @@ var ISO_8601_FULL =
  * @param value the vlaue of the entry in the object being parsed
  * @returns a Date object, if the value matches an ISO 8601 pattern with a valid date, the original value otherwise
  */
-export function JsonISO8601DateReviver(_: string, value: any): Date | any {
+export function JsonISO8601DateReviver(
+  _: string,
+  value: unknown
+): Date | unknown {
   if (typeof value == "string" && ISO_8601.test(value)) {
     const date = new Date(value);
     if (!Number.isNaN(date.getTime())) {
@@ -73,8 +76,8 @@ export function JsonISO8601DateReviver(_: string, value: any): Date | any {
  */
 export function JsonISO8601DateAndTimeReviver(
   _: string,
-  value: any
-): Date | any {
+  value: unknown
+): Date | unknown {
   if (typeof value == "string" && ISO_8601_FULL.test(value)) {
     const date = new Date(value);
     if (!Number.isNaN(date.getTime())) {

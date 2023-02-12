@@ -1,4 +1,4 @@
-import * as chai from "chai";
+import { expect } from "chai";
 import { Headers } from "cross-fetch";
 import * as nock from "nock";
 import { Body } from "nock/types";
@@ -9,14 +9,6 @@ import { hasProperty, isObject, isString } from "primitive-predicates";
 import { ResponseProcessorParams, TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
 
-var expect = chai.expect;
-
-export interface HttpData {
-  url: string;
-  data: any;
-  json: any;
-  args?: any;
-}
 export interface RawResponseData {
   status: string;
 }
@@ -47,12 +39,12 @@ function parseRawResponseData({
 }
 
 const standardUrl = new URL("https://localhost:80");
-let payload = {
+const payload = {
   something: "hello",
   other: "world",
 };
 const urlWithQueryString = new URL("https://localhost:80");
-for (let [key, value] of Object.entries(payload)) {
+for (const [key, value] of Object.entries(payload)) {
   urlWithQueryString.searchParams.set(key, value);
 }
 
@@ -66,10 +58,6 @@ describe("TypedHttpClient", function () {
 
     describe("With query string", function () {
       let requestUri: string;
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -103,7 +91,8 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("HEAD");
       });
       it("uses query string", async function () {
-        let params = new URL(`https://localhost:80${requestUri}`).searchParams;
+        const params = new URL(`https://localhost:80${requestUri}`)
+          .searchParams;
         expect(params.get("something")).to.equal("hello");
         expect(params.get("other")).to.equal("world");
       });
@@ -186,10 +175,6 @@ describe("TypedHttpClient", function () {
 
     describe("With query string", function () {
       let requestUri: string;
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -230,17 +215,14 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("GET");
       });
       it("uses query string", async function () {
-        let params = new URL(`https://localhost:80${requestUri}`).searchParams;
+        const params = new URL(`https://localhost:80${requestUri}`)
+          .searchParams;
         expect(params.get("something")).to.equal("hello");
         expect(params.get("other")).to.equal("world");
       });
     });
     describe("With query string and response with charset in Content-Type header", function () {
       let requestUri: string;
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -281,7 +263,8 @@ describe("TypedHttpClient", function () {
         expect(requestMethod).to.equal("GET");
       });
       it("uses query string", async function () {
-        let params = new URL(`https://localhost:80${requestUri}`).searchParams;
+        const params = new URL(`https://localhost:80${requestUri}`)
+          .searchParams;
         expect(params.get("something")).to.equal("hello");
         expect(params.get("other")).to.equal("world");
       });
@@ -435,10 +418,6 @@ describe("TypedHttpClient", function () {
       });
     });
     describe("With improper JSON response", function () {
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -474,10 +453,6 @@ describe("TypedHttpClient", function () {
     let restRes: TypedResponse<ResponseData>;
 
     describe("With body (generics provided)", function () {
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -488,7 +463,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.post<ResponseData, Record<string, any>>(
+        restRes = await client.post<ResponseData, typeof payload>(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -514,7 +489,7 @@ describe("TypedHttpClient", function () {
       });
     });
     describe("With body (generics inferred)", function () {
-      let payload = {
+      const payload = {
         something: "hello",
         other: "world",
       };
@@ -564,10 +539,10 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.post<ResponseData, Record<string, any>>(
+        restRes = await client.post<ResponseData, typeof payload>(
           {
             url: standardUrl,
-            payload: { something: "hello", other: "world" },
+            payload,
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
           },
@@ -716,10 +691,6 @@ describe("TypedHttpClient", function () {
     let restRes: TypedResponse<ResponseData>;
 
     describe("With body (generics provided)", function () {
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -730,7 +701,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.put<ResponseData, Record<string, any>>(
+        restRes = await client.put<ResponseData, typeof payload>(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -756,7 +727,7 @@ describe("TypedHttpClient", function () {
       });
     });
     describe("With body (generics inferred)", function () {
-      let payload = {
+      const payload = {
         something: "hello",
         other: "world",
       };
@@ -806,10 +777,10 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.put<ResponseData, Record<string, any>>(
+        restRes = await client.put<ResponseData, typeof payload>(
           {
             url: standardUrl,
-            payload: { something: "hello", other: "world" },
+            payload,
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
           },
@@ -950,10 +921,6 @@ describe("TypedHttpClient", function () {
     let restRes: TypedResponse<ResponseData>;
 
     describe("With body (generics provided)", function () {
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -964,7 +931,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.patch<ResponseData, Record<string, any>>(
+        restRes = await client.patch<ResponseData, typeof payload>(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -990,7 +957,7 @@ describe("TypedHttpClient", function () {
       });
     });
     describe("With body (generics inferred)", function () {
-      let payload = {
+      const payload = {
         something: "hello",
         other: "world",
       };
@@ -1040,10 +1007,10 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.patch<ResponseData, Record<string, any>>(
+        restRes = await client.patch<ResponseData, typeof payload>(
           {
             url: standardUrl,
-            payload: { something: "hello", other: "world" },
+            payload,
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
           },
@@ -1187,10 +1154,6 @@ describe("TypedHttpClient", function () {
     let restRes: TypedResponse<ResponseData>;
 
     describe("With body (generics provided)", function () {
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -1201,7 +1164,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.options<ResponseData, Record<string, any>>(
+        restRes = await client.options<ResponseData, typeof payload>(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -1227,7 +1190,7 @@ describe("TypedHttpClient", function () {
       });
     });
     describe("With body (generics inferred)", function () {
-      let payload = {
+      const payload = {
         something: "hello",
         other: "world",
       };
@@ -1277,10 +1240,10 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.options<ResponseData, Record<string, any>>(
+        restRes = await client.options<ResponseData, typeof payload>(
           {
             url: standardUrl,
-            payload: { something: "hello", other: "world" },
+            payload,
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
           },
@@ -1424,10 +1387,6 @@ describe("TypedHttpClient", function () {
     let restRes: TypedResponse<ResponseData>;
 
     describe("With body (generics provided)", function () {
-      let payload = {
-        something: "hello",
-        other: "world",
-      };
       before(async function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
@@ -1438,7 +1397,7 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.delete<ResponseData, Record<string, any>>(
+        restRes = await client.delete<ResponseData, typeof payload>(
           { url: standardUrl, payload },
           parseRawResponseData
         );
@@ -1464,7 +1423,7 @@ describe("TypedHttpClient", function () {
       });
     });
     describe("With body (generics inferred)", function () {
-      let payload = {
+      const payload = {
         something: "hello",
         other: "world",
       };
@@ -1514,10 +1473,10 @@ describe("TypedHttpClient", function () {
             requestBody = reqBody;
             return { status: "ok" };
           });
-        restRes = await client.delete<ResponseData, Record<string, any>>(
+        restRes = await client.delete<ResponseData, typeof payload>(
           {
             url: standardUrl,
-            payload: { something: "hello", other: "world" },
+            payload,
             additionalHeaders: { "extra-header": "3" },
             contentTypeHandler: WWWFormEncodedContentTypeHandler,
           },

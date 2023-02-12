@@ -168,14 +168,14 @@ export default class HttpClient {
     requestInit: MethodSpecificRequestInit
   ): Promise<Response> {
     // make copy of requestInit to make sure the original is maintained
-    let copyOfRequestInit: RequestInit = { ...requestInit };
+    const copyOfRequestInit: RequestInit = { ...requestInit };
     copyOfRequestInit.headers = this._getHeadersWithUserAgentMixedIn(
       copyOfRequestInit.headers
     );
     // Form the Request object.
-    let request: Request = new Request(requestUrl, copyOfRequestInit);
+    const request: Request = new Request(requestUrl, copyOfRequestInit);
     // Use the Request object to make the request.
-    let response: Response = await fetch(request);
+    const response: Response = await fetch(request);
     return response;
   }
   /**
@@ -188,7 +188,7 @@ export default class HttpClient {
    * @returns The formed {@link Headers} object
    */
   private _getHeadersWithUserAgentMixedIn(headers?: HeadersInit): Headers {
-    let userAgentUpdatedHeaders = new Headers(headers);
+    const userAgentUpdatedHeaders = new Headers(headers);
     if (this.userAgent) {
       userAgentUpdatedHeaders.set("User-Agent", this.userAgent);
     }
