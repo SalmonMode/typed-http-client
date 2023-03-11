@@ -1,5 +1,6 @@
-import { expect } from "chai";
+import { expect, use } from "chai";
 import { Headers } from "cross-fetch";
+import * as chaiAsPromised from "chai-as-promised";
 import * as nock from "nock";
 import { Body } from "nock/types";
 import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
@@ -8,6 +9,8 @@ import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers";
 import { hasProperty, isObject, isString } from "primitive-predicates";
 import { ResponseProcessorParams, TypedResponse } from "../types";
 import TypedHttpClient from "./TypedHttpClient";
+
+use(chaiAsPromised);
 
 export interface RawResponseData {
   status: string;
