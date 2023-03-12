@@ -1,1 +1,1 @@
-export * from "./TypedRequestOptions";
+export * from "./TypedRequestOptions.js";

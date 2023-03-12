@@ -1,32 +1,38 @@
 {
   "name": "typed-http-client",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses for Node, Browsers and React Native.",
   "main": "dist/index.js",
+  "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npx tsc",
-    "test": "nyc mocha --recursive ./dist/",
-    "test:ci": "nyc mocha --recursive ./dist/ --reporter mocha-junit-reporter",
+    "test": "c8 mocha ./dist/",
+    "test:ci": "c8 mocha ./dist/ --reporter mocha-junit-reporter",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix"
   },
-  "nyc": {
+  "c8": {
     "extension": [
       ".ts",
+      ".js",
+      ".jsx",
       ".tsx"
+    ],
+    "include": [
+      "**/*.{js,jsx,ts,tsx}"
     ],
     "exclude": [
       "**/*.d.ts",
       "**/*.spec.ts",
+      "**/*.spec.tsx",
       "coverage"
     ],
     "reporter": [
       "text",
       "html",
       "cobertura"
-    ],
-    "all": true
+    ]
   },
   "repository": {
     "type": "git",
@@ -65,17 +71,17 @@
     "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
+    "c8": "^7.13.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "eslint": "^8.34.0",
     "mocha": "^10.1.0",
     "mocha-junit-reporter": "^2.2.0",
     "nock": "^13.2.9",
-    "nyc": "^15.1.0",
     "sinon": "^14.0.2",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.5"
   }
 }

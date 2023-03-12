@@ -1,7 +1,8 @@
-import * as chai from "chai";
-import { JsonISO8601DateAndTimeReviver, JsonISO8601DateReviver } from "./Date";
-
-const expect = chai.expect;
+import { expect } from "chai";
+import {
+  JsonISO8601DateAndTimeReviver,
+  JsonISO8601DateReviver,
+} from "./Date.js";
 
 describe("JSON Reviver Functions", function () {
   describe("ISO 8601", function () {

@@ -1,10 +1,10 @@
 import * as chai from "chai";
-import { JSONContentTypeHandler } from "../contentTypeHandlers";
-import { TypedRequestOptionsBase } from "../types";
+import { default as JSONContentTypeHandler } from "../contentTypeHandlers/JSONContentTypeHandler.js";
+import type { TypedRequestOptionsBase } from "../types/TypedHttpClient.js";
 import {
   isTypedRequestOptionsWithPayload,
   isTypedRequestOptionsWithPayloadWithAdditionalAndAccept,
-} from "./TypedRequestOptions";
+} from "./TypedRequestOptions.js";
 
 const expect = chai.expect;
 

@@ -1,7 +1,7 @@
-export * from "./contentTypeHandlers";
-export * from "./errors";
-export { HttpClient } from "./httpClient";
-export * from "./JsonRevivers";
-export { TypedHttpClient } from "./typedClient";
-export * from "./typePredicates";
-export * from "./types";
+export * from "./contentTypeHandlers/index.js";
+export * from "./errors.js";
+export { default as HttpClient } from "./httpClient/HttpClient.js";
+export * from "./JsonRevivers/Date.js";
+export { default as TypedHttpClient } from "./typedClient/TypedHttpClient.js";
+export * from "./typePredicates/index.js";
+export * from "./types/index.js";

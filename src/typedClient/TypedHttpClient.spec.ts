@@ -1,14 +1,17 @@
 import { expect, use } from "chai";
 import { Headers } from "cross-fetch";
-import * as chaiAsPromised from "chai-as-promised";
-import * as nock from "nock";
-import { Body } from "nock/types";
-import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers";
-import { ResponseBodyNotJSONError } from "../errors";
-import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers";
+import { default as chaiAsPromised } from "chai-as-promised";
+import { default as nock } from "nock";
+import type { Body } from "nock/types";
+import { default as WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers/WWWFormEncodedContentTypeHandler.js";
+import { ResponseBodyNotJSONError } from "../errors.js";
+import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers/Date.js";
 import { hasProperty, isObject, isString } from "primitive-predicates";
-import { ResponseProcessorParams, TypedResponse } from "../types";
-import TypedHttpClient from "./TypedHttpClient";
+import type {
+  ResponseProcessorParams,
+  TypedResponse,
+} from "../types/TypedHttpClient.js";
+import { default as TypedHttpClient } from "./TypedHttpClient.js";
 
 use(chaiAsPromised);
 

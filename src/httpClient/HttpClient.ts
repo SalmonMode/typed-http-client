@@ -1,9 +1,8 @@
 import fetch, { Headers, Request } from "cross-fetch";
-import {
+import type {
   DeleteRequestInit,
   GetRequestInit,
   HeadRequestInit,
-  HttpMethod,
   MethodSpecificRequestInit,
   OptionsRequestInit,
   PatchRequestInit,
@@ -11,7 +10,8 @@ import {
   PutRequestInit,
   RequestInitSansMethod,
   RequestInitSansMethodAndBody,
-} from "../types";
+} from "../types/HttpClient.js";
+import { HttpMethod } from "../types/HttpMethod.js";
 
 export default class HttpClient {
   /**
@@ -26,7 +26,7 @@ export default class HttpClient {
 
   /**
    * Make a HEAD request.
-   * 
+   *
    * Note: HEAD requests cannot contain bodies, and so any body provided in the RequestInit will be ignored.
    *
    * @param requestUrl The URL to make the request to
@@ -64,7 +64,7 @@ export default class HttpClient {
 
   /**
    * Make a GET request.
-   * 
+   *
    * Note: GET requests cannot contain bodies, and so any body provided in the RequestInit will be ignored.
    *
    * @param requestUrl The URL to make the request to

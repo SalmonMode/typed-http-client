@@ -1,5 +1,5 @@
-import { URL } from "url";
-import { ContentTypeHandler } from "./ContentTypeHandlers";
+import type { URL } from "url";
+import type { ContentTypeHandler } from "./ContentTypeHandlers.js";
 
 export interface TypedResponse<T> {
   statusCode: number;

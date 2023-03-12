@@ -1,5 +1,5 @@
-import { MediaTypeCategory } from "./MediaTypeCategory";
-import { NodeSupportedEncoding } from "./NodeSupportedEncoding";
+import type { MediaTypeCategory } from "./MediaTypeCategory.js";
+import type { NodeSupportedEncoding } from "./NodeSupportedEncoding.js";
 
 /**
  * The string format for MIME types that are provided in the Content-Type header.

@@ -1,1 +1,1 @@
-export { default as TypedHttpClient } from "./TypedHttpClient";
+export { default as TypedHttpClient } from "./TypedHttpClient.js";

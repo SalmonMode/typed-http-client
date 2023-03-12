@@ -1,12 +1,12 @@
 import { Headers } from "cross-fetch";
-import { JSONContentTypeHandler } from "../contentTypeHandlers";
-import { ResponseBodyNotJSONError } from "../errors";
-import { HttpClient } from "../httpClient";
+import { default as JSONContentTypeHandler } from "../contentTypeHandlers/JSONContentTypeHandler.js";
+import { ResponseBodyNotJSONError } from "../errors.js";
+import { default as HttpClient } from "../httpClient/HttpClient.js";
 import {
   isTypedRequestOptionsWithPayload,
   isTypedRequestOptionsWithPayloadWithAdditionalAndAccept,
-} from "../typePredicates";
-import {
+} from "../typePredicates/TypedRequestOptions.js";
+import type {
   JsonReviver,
   RequestOptions,
   RequestOptionsWithAdditionalAndAccept,
@@ -14,7 +14,7 @@ import {
   TypedRequestOptions,
   TypedRequestOptionsWithAdditionalAndAccept,
   TypedResponse,
-} from "../types";
+} from "../types/TypedHttpClient.js";
 
 /**
  * An HTTP client that returns typed responses.

@@ -1,7 +1,5 @@
-import * as chai from "chai";
-import JSONContentTypeHandler from "./JSONContentTypeHandler";
-
-const expect = chai.expect;
+import { expect } from "chai";
+import { default as JSONContentTypeHandler } from "./JSONContentTypeHandler.js";
 
 describe("JSONContentTypeHandler", function () {
   it("provides stringified JSON from data", function () {

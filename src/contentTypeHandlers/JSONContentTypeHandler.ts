@@ -1,9 +1,9 @@
-import {
-  ContentTypeHeaderString,
+import type {
   ContentTypeHandler,
-  MediaTypeCategory,
-  NodeSupportedEncoding,
-} from "../types";
+  ContentTypeHeaderString,
+} from "../types/ContentTypeHandlers.js";
+import { MediaTypeCategory } from "../types/MediaTypeCategory.js";
+import { NodeSupportedEncoding } from "../types/NodeSupportedEncoding.js";
 
 /**
  * A content type handler that can provide JSON encoded bodies.

@@ -1,8 +1,8 @@
-import { HttpMethod } from "./HttpMethod";
+import type { HttpMethod } from "./HttpMethod.js";
 
-export type RequestInitSansMethod = Omit<RequestInit, "method">
-export type RequestInitSansBody = Omit<RequestInit, "body">
-export type RequestInitSansMethodAndBody = Omit<RequestInit, "body" | "method">
+export type RequestInitSansMethod = Omit<RequestInit, "method">;
+export type RequestInitSansBody = Omit<RequestInit, "body">;
+export type RequestInitSansMethodAndBody = Omit<RequestInit, "body" | "method">;
 /**
  * The details for a HEAD request.
  *

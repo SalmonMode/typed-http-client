@@ -1,7 +1,7 @@
 import { expect, use } from "chai";
-import * as chaiAsPromised from "chai-as-promised";
-import * as nock from "nock";
-import HttpClient from "./HttpClient";
+import { default as chaiAsPromised } from "chai-as-promised";
+import { default as nock } from "nock";
+import { default as HttpClient } from "./HttpClient.js";
 
 use(chaiAsPromised);
 

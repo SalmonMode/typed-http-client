@@ -1,9 +1,9 @@
-import {
+import type {
   ContentTypeHandler,
-  MediaTypeCategory,
-  NodeSupportedEncoding,
   ContentTypeHeaderString,
-} from "../types";
+} from "../types/ContentTypeHandlers.js";
+import { MediaTypeCategory } from "../types/MediaTypeCategory.js";
+import { NodeSupportedEncoding } from "../types/NodeSupportedEncoding.js";
 
 /**
  * A content type handler that can provide WWW Form encoded bodies.

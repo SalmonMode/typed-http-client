@@ -1,9 +1,9 @@
-import {
+import type {
   RequestOptions,
   TypedRequestOptions,
   TypedRequestOptionsWithAdditionalAndAccept,
   TypedRequestOptionsWithPayload,
-} from "../types";
+} from "../types/TypedHttpClient.js";
 
 /**
  * A type predicate for narrowing type possibilities based on whether or not a payload was provided.
