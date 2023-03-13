@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { default as WWWFormEncodedContentTypeHandler } from "./WWWFormEncodedContentTypeHandler.js";
+import WWWFormEncodedContentTypeHandler from "./WWWFormEncodedContentTypeHandler.js";
 
 describe("WWWFormEncodedContentTypeHandler", function () {
   it("provides form encoded from data", function () {

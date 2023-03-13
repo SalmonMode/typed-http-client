@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { default as JSONContentTypeHandler } from "../contentTypeHandlers/JSONContentTypeHandler.js";
+import { JSONContentTypeHandler } from "../contentTypeHandlers/index.js";
 import type { TypedRequestOptionsBase } from "../types/TypedHttpClient.js";
 import {
   isTypedRequestOptionsWithPayload,

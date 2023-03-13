@@ -1,17 +1,90 @@
 {
   "name": "typed-http-client",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses for Node, Browsers and React Native.",
   "main": "dist/index.js",
   "type": "module",
-  "types": "dist/index.d.ts",
+  "types": "dist/esmodule/index.d.ts",
   "scripts": {
-    "build": "npx tsc",
+    "build": "rm -fr dist/* && npx tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup.sh",
     "test": "c8 mocha ./dist/",
     "test:ci": "c8 mocha ./dist/ --reporter mocha-junit-reporter",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix"
   },
+  "exports": {
+    ".": {
+      "require": "./dist/commonjs/index.js",
+      "import": "./dist/esmodule/index.js"
+    },
+    "./TypedHttpClient": {
+      "require": "./dist/commonjs/typedClient/TypedHttpClient.js",
+      "import": "./dist/esmodule/typedClient/TypedHttpClient.js"
+    },
+    "./JsonRevivers": {
+      "require": "./dist/commonjs/JsonRevivers/index.js",
+      "import": "./dist/esmodule/JsonRevivers/index.js"
+    },
+    "./JsonRevivers/Date": {
+      "require": "./dist/commonjs/JsonRevivers/Date.js",
+      "import": "./dist/esmodule/JsonRevivers/Date.js"
+    },
+    "./HttpClient": {
+      "require": "./dist/commonjs/httpClient/HttpClient.js",
+      "import": "./dist/esmodule/httpClient/HttpClient.js"
+    },
+    "./errors": {
+      "require": "./dist/commonjs/errors.js",
+      "import": "./dist/esmodule/errors.js"
+    },
+    "./contentTypeHandlers": {
+      "require": "./dist/commonjs/contentTypeHandlers/index.js",
+      "import": "./dist/esmodule/contentTypeHandlers/index.js"
+    },
+    "./contentTypeHandlers/JSONContentTypeHandler": {
+      "require": "./dist/commonjs/contentTypeHandlers/JSONContentTypeHandler.js",
+      "import": "./dist/esmodule/contentTypeHandlers/JSONContentTypeHandler.js"
+    },
+    "./contentTypeHandlers/WWWFormEncodedContentTypeHandler": {
+      "require": "./dist/commonjs/contentTypeHandlers/WWWFormEncodedContentTypeHandler.js",
+      "import": "./dist/esmodule/contentTypeHandlers/WWWFormEncodedContentTypeHandler.js"
+    },
+    "./types": {
+      "require": "./dist/commonjs/types/index.js",
+      "import": "./dist/esmodule/types/index.js"
+    },
+    "./types/ContentTypeHandlers": {
+      "require": "./dist/commonjs/types/ContentTypeHandlers.js",
+      "import": "./dist/esmodule/types/ContentTypeHandlers.js"
+    },
+    "./types/HttpClient": {
+      "require": "./dist/commonjs/types/HttpClient.js",
+      "import": "./dist/esmodule/types/HttpClient.js"
+    },
+    "./types/HttpCode": {
+      "require": "./dist/commonjs/types/HttpCode.js",
+      "import": "./dist/esmodule/types/HttpCode.js"
+    },
+    "./types/HttpMethod": {
+      "require": "./dist/commonjs/types/HttpMethod.js",
+      "import": "./dist/esmodule/types/HttpMethod.js"
+    },
+    "./types/MediaTypeCategory": {
+      "require": "./dist/commonjs/types/MediaTypeCategory.js",
+      "import": "./dist/esmodule/types/MediaTypeCategory.js"
+    },
+    "./types/NodeSupportedEncoding": {
+      "require": "./dist/commonjs/types/NodeSupportedEncoding.js",
+      "import": "./dist/esmodule/types/NodeSupportedEncoding.js"
+    },
+    "./types/TypedHttpClient": {
+      "require": "./dist/commonjs/types/TypedHttpClient.js",
+      "import": "./dist/esmodule/types/TypedHttpClient.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "c8": {
     "extension": [
       ".ts",
