@@ -6,14 +6,14 @@ import type { Body } from "nock/types";
 import { isObject } from "primitive-predicates/Object";
 import { hasProperty } from "primitive-predicates/Property";
 import { isString } from "primitive-predicates/String";
-import { default as WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers/WWWFormEncodedContentTypeHandler.js";
+import { WWWFormEncodedContentTypeHandler } from "../contentTypeHandlers/index.js";
 import { ResponseBodyNotJSONError } from "../errors.js";
 import { JsonISO8601DateAndTimeReviver } from "../JsonRevivers/Date.js";
 import type {
   ResponseProcessorParams,
   TypedResponse,
 } from "../types/TypedHttpClient.js";
-import TypedHttpClient from "./TypedHttpClient.js";
+import TypedHttpClient from "../index.js";
 
 use(chaiAsPromised);
 

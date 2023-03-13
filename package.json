@@ -1,6 +1,6 @@
 {
   "name": "typed-http-client",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses for Node, Browsers and React Native.",
   "main": "dist/index.js",
   "type": "module",
