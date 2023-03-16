@@ -110,7 +110,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .head("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -141,7 +141,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .head("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -283,7 +283,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData & {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData & {
             myDate: string;
           } {
             requestHeaders = new Headers(this.req.headers);
@@ -325,7 +325,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -359,7 +359,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .get("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -432,7 +432,7 @@ describe("TypedHttpClient", function () {
           .get("/")
           .reply(
             200,
-            function (uri: string, reqBody: Body): string {
+            function (_uri: string, reqBody: Body): string {
               requestHeaders = new Headers(this.req.headers);
               requestMethod = this.req.method;
               requestBody = reqBody;
@@ -465,7 +465,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -505,7 +505,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -541,7 +541,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -587,7 +587,7 @@ describe("TypedHttpClient", function () {
           .post("/")
           .reply(
             200,
-            function (uri: string, reqBody: Body): ResponseData {
+            function (_uri: string, reqBody: Body): ResponseData {
               requestHeaders = new Headers(this.req.headers);
               requestMethod = this.req.method;
               requestBody = reqBody;
@@ -625,7 +625,7 @@ describe("TypedHttpClient", function () {
           .post("/")
           .reply(
             200,
-            function (uri: string, reqBody: Body): ResponseData {
+            function (_uri: string, reqBody: Body): ResponseData {
               requestHeaders = new Headers(this.req.headers);
               requestMethod = this.req.method;
               requestBody = reqBody;
@@ -658,7 +658,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .post("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -703,7 +703,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -743,7 +743,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -779,7 +779,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -823,7 +823,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -857,7 +857,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -888,7 +888,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .put("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -933,7 +933,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -973,7 +973,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1009,7 +1009,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1053,7 +1053,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1087,7 +1087,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1121,7 +1121,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .patch("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1166,7 +1166,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1206,7 +1206,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1242,7 +1242,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1286,7 +1286,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1320,7 +1320,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1354,7 +1354,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .options("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1399,7 +1399,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1439,7 +1439,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1475,7 +1475,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1519,7 +1519,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1553,7 +1553,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;
@@ -1587,7 +1587,7 @@ describe("TypedHttpClient", function () {
         client = new TypedHttpClient("typed-http-client-tests");
         nock("https://localhost:80")
           .delete("/")
-          .reply(200, function (uri: string, reqBody: Body): ResponseData {
+          .reply(200, function (_uri: string, reqBody: Body): ResponseData {
             requestHeaders = new Headers(this.req.headers);
             requestMethod = this.req.method;
             requestBody = reqBody;

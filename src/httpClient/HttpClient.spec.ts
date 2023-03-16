@@ -265,7 +265,7 @@ describe("HttpClient", function () {
       beforeEach(function () {
         nockScope
           .put("/put")
-          .reply(200, function (uri: string, reqBody: nock.Body): nock.Body {
+          .reply(200, function (_uri: string, reqBody: nock.Body): nock.Body {
             return {
               data: reqBody,
             };
