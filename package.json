@@ -1,12 +1,14 @@
 {
   "name": "typed-http-client",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "A TypeScript HTTP client that facilitates strongly typed requests and responses for Node, Browsers and React Native.",
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/esmodule/index.d.ts",
   "scripts": {
     "build": "rm -fr dist/* && npx tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup.sh",
+    "build:diagnostic": "npx tsc -b --extendedDiagnostics --generateTrace tracing_output_folder",
+    "analyze": "npx analyze-trace --expandTypes true tracing_output_folder",
     "test": "c8 mocha ./dist/",
     "test:ci": "c8 mocha ./dist/ --reporter mocha-junit-reporter",
     "lint": "npx eslint .",
@@ -144,6 +146,7 @@
     "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
+    "@typescript/analyze-trace": "^0.10.0",
     "c8": "^7.13.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
