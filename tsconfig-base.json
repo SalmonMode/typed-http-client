@@ -24,7 +24,6 @@
     "strictNullChecks": true,
     "target": "ESNext",
     "esModuleInterop": true,
-    "importsNotUsedAsValues": "error",
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
