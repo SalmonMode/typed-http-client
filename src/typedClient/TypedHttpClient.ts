@@ -6,14 +6,14 @@ import {
   isTypedRequestOptionsWithPayload,
   isTypedRequestOptionsWithPayloadWithAdditionalAndAccept,
 } from "../typePredicates/TypedRequestOptions.js";
-import type {
-  JsonReviver,
-  RequestOptions,
-  RequestOptionsWithAdditionalAndAccept,
-  ResponseProcessor,
-  TypedRequestOptions,
-  TypedRequestOptionsWithAdditionalAndAccept,
-  TypedResponse,
+import {
+  type JsonReviver,
+  type RequestOptions,
+  type RequestOptionsWithAdditionalAndAccept,
+  type ResponseProcessor,
+  type TypedRequestOptions,
+  type TypedRequestOptionsWithAdditionalAndAccept,
+  type TypedResponse,
 } from "../types/TypedHttpClient.js";
 
 /**

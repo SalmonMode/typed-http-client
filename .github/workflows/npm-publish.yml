@@ -6,7 +6,7 @@ name: Node.js Package
 on:
   push:
     branches:
-    - main
+      - main
 
 jobs:
   build:
@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
+      - run: npm run lint
       - run: npm run build
       - run: npm run test:ci
       - name: Code Coverage Summary
