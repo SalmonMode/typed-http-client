@@ -26,6 +26,7 @@
     "esModuleInterop": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedParameters": true,
+    "isolatedModules": true,
     "noUncheckedIndexedAccess": true,
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true
